@@ -1,4 +1,5 @@
 import { StatusBadge } from '../../../common/components/status-badge';
+import { EmptyState } from '../../../common/components/empty-state';
 import type { TUser } from '../../../api/users/type';
 import {
     Table,
@@ -15,37 +16,38 @@ interface UserTableProps {
 
 export const UserTable = ({ users }: UserTableProps) => {
     return (
-        <article className="bg-white border rounded-xl shadow-sm overflow-hidden">
-            <Table>
-                <TableHeader className="bg-gray-50/50">
-                    <TableRow>
-                        <TableHead className="font-semibold text-gray-500 uppercase tracking-wider text-xs">ID</TableHead>
-                        <TableHead className="font-semibold text-gray-500 uppercase tracking-wider text-xs">Nama</TableHead>
-                        <TableHead className="font-semibold text-gray-500 uppercase tracking-wider text-xs">Role</TableHead>
-                        <TableHead className="font-semibold text-gray-500 uppercase tracking-wider text-xs">Status</TableHead>
-                    </TableRow>
-                </TableHeader>
-                <TableBody>
-                    {users.length > 0 ? (
-                        users.map((user) => (
-                            <TableRow key={user.id}>
-                                <TableCell className="font-medium text-gray-500">{user.id}</TableCell>
-                                <TableCell className="font-medium text-gray-900">{user.name}</TableCell>
-                                <TableCell className="text-gray-500">{user.role}</TableCell>
-                                <TableCell>
-                                    <StatusBadge status={user.status} />
-                                </TableCell>
-                            </TableRow>
-                        ))
-                    ) : (
-                        <TableRow>
-                            <TableCell colSpan={4} className="h-24 text-center text-gray-500">
-                                Tidak ada data user yang sesuai dengan pencarian.
+        <Table>
+            <TableHeader>
+                <TableRow>
+                    <TableHead>ID</TableHead>
+                    <TableHead>Nama</TableHead>
+                    <TableHead>Role</TableHead>
+                    <TableHead>Status</TableHead>
+                </TableRow>
+            </TableHeader>
+            <TableBody>
+                {users.length > 0 ? (
+                    users.map((user) => (
+                        <TableRow key={user.id}>
+                            <TableCell>{user.id}</TableCell>
+                            <TableCell className="font-medium">{user.name}</TableCell>
+                            <TableCell>{user.role}</TableCell>
+                            <TableCell>
+                                <StatusBadge status={user.status} />
                             </TableCell>
                         </TableRow>
-                    )}
-                </TableBody>
-            </Table>
-        </article>
+                    ))
+                ) : (
+                    <TableRow>
+                        <TableCell colSpan={4} className="p-0">
+                            <EmptyState
+                                title="Data User Tidak Ditemukan"
+                                description="Tidak ada data user yang sesuai dengan kata kunci pencarian Anda."
+                            />
+                        </TableCell>
+                    </TableRow>
+                )}
+            </TableBody>
+        </Table>
     );
 };

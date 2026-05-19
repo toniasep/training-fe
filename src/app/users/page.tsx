@@ -12,19 +12,21 @@ const UsersPage = () => {
     }, [searchQuery]);
 
     return (
-        <main className="p-6 md:p-8 max-w-7xl mx-auto w-full">
+        <div>
             <PageHeader
                 title="Manajemen User"
                 description="Kelola data pengguna"
             />
 
-            <UserListFilter
-                searchQuery={searchQuery}
-                onSearchChange={setSearchQuery}
-            />
+            <div className="mb-6 max-w-xs">
+                <UserListFilter
+                    searchQuery={searchQuery}
+                    onSearchChange={setSearchQuery}
+                />
+            </div>
 
             <UserTable users={filteredUsers} />
-        </main>
+        </div>
     );
 };
 
