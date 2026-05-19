@@ -26,8 +26,8 @@ export const Sidebar = () => {
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild isActive={location.pathname === "/" || location.pathname === "/dashboard"}>
-                  <Link to="/">
+                <SidebarMenuButton asChild isActive={location.pathname === "/" || location.pathname.startsWith("/dashboard")}>
+                  <Link to="/dashboard">
                     <LayoutDashboard />
                     <span>Dashboard</span>
                   </Link>
@@ -35,7 +35,7 @@ export const Sidebar = () => {
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild isActive={location.pathname.startsWith("/requests")}>
-                  <Link to="#">
+                  <Link to="/requests">
                     <FileText />
                     <span>Requests</span>
                   </Link>
@@ -43,7 +43,7 @@ export const Sidebar = () => {
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild isActive={location.pathname.startsWith("/audit-logs")}>
-                  <Link to="#">
+                  <Link to="/audit-logs">
                     <ClipboardList />
                     <span>Audit Logs</span>
                   </Link>
