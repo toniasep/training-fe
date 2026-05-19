@@ -1,26 +1,14 @@
 import { useState, useMemo } from 'react';
-import { PageHeader } from '../../common/components/PageHeader';
-import type { User } from '../../types';
-import { UserListFilter } from './_components/UserListFilter';
-import { UserTable } from './_components/UserTable';
-
-const mockUsers: User[] = [
-    { id: '1', name: 'John Doe', email: 'john.doe@example.com', role: 'Developer', status: 'Aktif' },
-    { id: '2', name: 'Jane Smith', email: 'jane.smith@example.com', role: 'Admin', status: 'Pending' },
-    { id: '3', name: 'Michael Brown', email: 'michael.brown@example.com', role: 'User', status: 'Inactive' },
-    { id: '4', name: 'Emily Davis', email: 'emily.davis@example.com', role: 'Developer', status: 'Aktif' },
-    { id: '5', name: 'Chris Johnson', email: 'chris.johnson@example.com', role: 'User', status: 'Aktif' },
-];
+import { PageHeader } from '../../common/components/page-header';
+import { UserListFilter } from './_components/user-list-filter';
+import { UserTable } from './_components/user-table';
+import { getUser } from '../../api/users/api';
 
 const UsersPage = () => {
     const [searchQuery, setSearchQuery] = useState('');
 
     const filteredUsers = useMemo(() => {
-        return mockUsers.filter(user =>
-            user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            user.role.toLowerCase().includes(searchQuery.toLowerCase())
-        );
+        return getUser(searchQuery);
     }, [searchQuery]);
 
     return (

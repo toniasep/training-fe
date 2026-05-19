@@ -1,5 +1,5 @@
 import UsersPage from './app/users/page';
-import { AppShell } from './common/components/AppShell';
+import { AppShell } from './common/components/app-shell';
 
 function App() {
   return (

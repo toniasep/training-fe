@@ -1,8 +1,8 @@
-import { StatusBadge } from '../../../common/components/StatusBadge';
-import type { User } from '../../../types';
+import { StatusBadge } from '../../../common/components/status-badge';
+import type { TUser } from '../../../api/users/type';
 
 interface UserTableProps {
-    users: User[];
+    users: TUser[];
 }
 
 export const UserTable = ({ users }: UserTableProps) => {
