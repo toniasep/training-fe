@@ -1,16 +1,63 @@
+import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { getRequestById } from '../../../api/requests/api';
 import { StatusBadge } from '../../../common/components/status-badge';
-import { ArrowLeft, FileText, Calendar, Hash, CheckCircle, Clock, XCircle } from 'lucide-react';
+import { ArrowLeft, FileText, Calendar, Hash, CheckCircle, Clock, XCircle, AlertTriangle } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
+import { Spinner } from '@/components/ui/spinner';
+import type { TRequest } from '../../../api/requests/type';
 
 const RequestDetailPage = () => {
     const { id } = useParams();
-    const request = id ? getRequestById(id) : undefined;
+    const [request, setRequest] = useState<TRequest | null>(null);
+    const [isLoading, setIsLoading] = useState(!!id);
+    const [error, setError] = useState<string | null>(null);
 
-    if (!request) {
+    useEffect(() => {
+        if (!id) return;
+
+        let isMounted = true;
+        
+        queueMicrotask(() => {
+            if (isMounted) {
+                setIsLoading(true);
+                setError(null);
+            }
+        });
+
+        getRequestById(id)
+            .then((data) => {
+                if (isMounted) {
+                    setRequest(data);
+                    setIsLoading(false);
+                }
+            })
+            .catch((err: unknown) => {
+                if (isMounted) {
+                    console.error('Failed to fetch request details:', err);
+                    const errorMessage = err instanceof Error ? err.message : 'Request tidak ditemukan.';
+                    setError(errorMessage);
+                    setIsLoading(false);
+                }
+            });
+
+        return () => {
+            isMounted = false;
+        };
+    }, [id]);
+
+    if (isLoading) {
+        return (
+            <div className="flex flex-col items-center justify-center p-12 bg-slate-900/20 rounded-xl border border-slate-800/40">
+                <Spinner className="h-8 w-8 text-indigo-500 mb-2" />
+                <p className="text-sm text-slate-400">Memuat detail request...</p>
+            </div>
+        );
+    }
+
+    if (error || !request) {
         return (
             <div>
                 <div className="mb-4">
@@ -22,10 +69,11 @@ const RequestDetailPage = () => {
                     </Button>
                 </div>
                 <h1 className="text-2xl font-bold mb-4">Detail Request</h1>
-                <Card className="max-w-2xl p-8 text-center">
+                <Card className="max-w-2xl p-8 text-center border-red-500/20 bg-red-500/5">
                     <CardContent className="flex flex-col items-center justify-center">
-                        <p className="text-destructive font-medium mb-2">Request Tidak Ditemukan</p>
-                        <p className="text-muted-foreground text-sm">Tidak ada request dengan ID "{id}" di database.</p>
+                        <AlertTriangle className="h-10 w-10 text-red-500 mb-2" />
+                        <p className="text-destructive font-medium mb-2">Gagal Memuat Detail Request</p>
+                        <p className="text-muted-foreground text-sm">{error || `Tidak ada request dengan ID "${id}" di database.`}</p>
                     </CardContent>
                 </Card>
             </div>

@@ -1,14 +1,17 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { authApi } from '../api/auth/api';
 
 interface AuthUser {
+    id: string;
     email: string;
     name: string;
     role: string;
+    status: string;
 }
 
 interface AuthContextType {
     user: AuthUser | null;
-    login: (email: string, name: string, role: string) => void;
+    login: (token: string, user: AuthUser) => void;
     logout: () => void;
     isLoading: boolean;
 }
@@ -20,25 +23,52 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        const savedUser = localStorage.getItem('auth_user');
-        if (savedUser) {
-            try {
-                setUser(JSON.parse(savedUser));
-            } catch (e) {
-                localStorage.removeItem('auth_user');
+        const verifySession = async () => {
+            const savedToken = localStorage.getItem('auth_token');
+            const savedUser = localStorage.getItem('auth_user');
+
+            if (!savedToken) {
+                setIsLoading(false);
+                return;
             }
-        }
-        setIsLoading(false);
+
+            // Set initial state from localStorage cache to prevent flickers
+            if (savedUser) {
+                try {
+                    setUser(JSON.parse(savedUser));
+                } catch {
+                    localStorage.removeItem('auth_user');
+                }
+            }
+
+            try {
+                // Verify token with backend
+                const currentUser = await authApi.getCurrentUser();
+                setUser(currentUser);
+                localStorage.setItem('auth_user', JSON.stringify(currentUser));
+            } catch (error) {
+                console.error('Failed to verify session:', error);
+                // Clear session on authentication error (e.g. 401)
+                setUser(null);
+                localStorage.removeItem('auth_token');
+                localStorage.removeItem('auth_user');
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        verifySession();
     }, []);
 
-    const login = (email: string, name: string, role: string) => {
-        const newUser = { email, name, role };
-        setUser(newUser);
-        localStorage.setItem('auth_user', JSON.stringify(newUser));
+    const login = (token: string, user: AuthUser) => {
+        setUser(user);
+        localStorage.setItem('auth_token', token);
+        localStorage.setItem('auth_user', JSON.stringify(user));
     };
 
     const logout = () => {
         setUser(null);
+        localStorage.removeItem('auth_token');
         localStorage.removeItem('auth_user');
     };
 
@@ -49,6 +79,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     );
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => {
     const context = useContext(AuthContext);
     if (context === undefined) {

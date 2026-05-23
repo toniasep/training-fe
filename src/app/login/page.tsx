@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { useState } from 'react';
 import { AlertCircle, LockKeyhole } from 'lucide-react';
 import { Spinner } from '@/components/ui/spinner';
-import { getUserLogin } from '../../api/users/api';
+import { authApi } from '../../api/auth/api';
 
 const loginSchema = z.object({
     email: z.string().min(1, 'Email wajib diisi').email('Format email tidak valid'),
@@ -24,10 +24,6 @@ const LoginPage = () => {
     const [submitError, setSubmitError] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    if (user) {
-        return <Navigate to="/dashboard" replace />;
-    }
-
     const {
         register,
         handleSubmit,
@@ -40,19 +36,22 @@ const LoginPage = () => {
         },
     });
 
+    if (user) {
+        return <Navigate to="/dashboard" replace />;
+    }
+
     const onSubmit = async (data: LoginSchema) => {
         setIsSubmitting(true);
         setSubmitError(null);
 
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-
-        const matchedUser = getUserLogin(data.email, data.password);
-
-        if (matchedUser) {
-            login(matchedUser.email, matchedUser.name, matchedUser.role);
+        try {
+            const response = await authApi.login(data.email, data.password);
+            login(response.token, response.user);
             navigate('/dashboard');
-        } else {
-            setSubmitError('Email tidak terdaftar atau password salah!');
+        } catch (error: unknown) {
+            console.error('Login error:', error);
+            const errorMessage = error instanceof Error ? error.message : 'Terjadi kesalahan sistem, silakan coba lagi.';
+            setSubmitError(errorMessage);
             setIsSubmitting(false);
         }
     };

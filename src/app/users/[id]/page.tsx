@@ -1,16 +1,63 @@
+import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { getUserById } from '../../../api/users/api';
 import { StatusBadge } from '../../../common/components/status-badge';
-import { ArrowLeft, User, Mail, Shield, Activity, Hash } from 'lucide-react';
+import { ArrowLeft, User, Mail, Shield, Activity, Hash, AlertTriangle } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
+import { Spinner } from '@/components/ui/spinner';
+import type { TUser } from '../../../api/users/type';
 
 const UserDetailPage = () => {
     const { id } = useParams();
-    const user = id ? getUserById(id) : undefined;
+    const [user, setUser] = useState<TUser | null>(null);
+    const [isLoading, setIsLoading] = useState(!!id);
+    const [error, setError] = useState<string | null>(null);
 
-    if (!user) {
+    useEffect(() => {
+        if (!id) return;
+
+        let isMounted = true;
+        
+        queueMicrotask(() => {
+            if (isMounted) {
+                setIsLoading(true);
+                setError(null);
+            }
+        });
+
+        getUserById(id)
+            .then((data) => {
+                if (isMounted) {
+                    setUser(data);
+                    setIsLoading(false);
+                }
+            })
+            .catch((err: unknown) => {
+                if (isMounted) {
+                    console.error('Failed to fetch user details:', err);
+                    const errorMessage = err instanceof Error ? err.message : 'User tidak ditemukan.';
+                    setError(errorMessage);
+                    setIsLoading(false);
+                }
+            });
+
+        return () => {
+            isMounted = false;
+        };
+    }, [id]);
+
+    if (isLoading) {
+        return (
+            <div className="flex flex-col items-center justify-center p-12 bg-slate-900/20 rounded-xl border border-slate-800/40">
+                <Spinner className="h-8 w-8 text-indigo-500 mb-2" />
+                <p className="text-sm text-slate-400">Memuat detail user...</p>
+            </div>
+        );
+    }
+
+    if (error || !user) {
         return (
             <div>
                 <div className="mb-4">
@@ -22,10 +69,11 @@ const UserDetailPage = () => {
                     </Button>
                 </div>
                 <h1 className="text-2xl font-bold mb-4">Detail User</h1>
-                <Card className="max-w-2xl p-8 text-center">
+                <Card className="max-w-2xl p-8 text-center border-red-500/20 bg-red-500/5">
                     <CardContent className="flex flex-col items-center justify-center">
-                        <p className="text-destructive font-medium mb-2">User Tidak Ditemukan</p>
-                        <p className="text-muted-foreground text-sm">Tidak ada user dengan ID "{id}" di database.</p>
+                        <AlertTriangle className="h-10 w-10 text-red-500 mb-2" />
+                        <p className="text-destructive font-medium mb-2">Gagal Memuat Detail User</p>
+                        <p className="text-muted-foreground text-sm">{error || `Tidak ada user dengan ID "${id}" di database.`}</p>
                     </CardContent>
                 </Card>
             </div>

@@ -86,7 +86,9 @@ export const UserFormDialog = ({ open, onOpenChange, user, onSuccess }: UserForm
                     password: '',
                 });
             }
-            setSubmitError(null);
+            queueMicrotask(() => {
+                setSubmitError(null);
+            });
         }
     }, [open, user, reset]);
 
@@ -99,17 +101,18 @@ export const UserFormDialog = ({ open, onOpenChange, user, onSuccess }: UserForm
 
         try {
             if (isEdit && user) {
-                const updated = updateUser(user.id, data);
+                const updated = await updateUser(user.id, data);
                 if (!updated) {
                     throw new Error('Gagal memperbarui user. User tidak ditemukan.');
                 }
             } else {
-                createUser(data);
+                await createUser(data);
             }
             onSuccess();
             onOpenChange(false);
-        } catch (error: any) {
-            setSubmitError(error.message || 'Terjadi kesalahan sistem. Silakan coba lagi.');
+        } catch (error: unknown) {
+            const errorMessage = error instanceof Error ? error.message : 'Terjadi kesalahan sistem. Silakan coba lagi.';
+            setSubmitError(errorMessage);
         } finally {
             setIsSubmitting(false);
         }
