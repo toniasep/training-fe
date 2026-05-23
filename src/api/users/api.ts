@@ -15,3 +15,7 @@ export const getUser = (searchQuery: string): TUser[] => {
         user.role.toLowerCase().includes(searchQuery.toLowerCase())
     );
 }
+
+export const getUserById = (id: string): TUser | undefined => {
+    return mockUsers.find(user => user.id === id);
+}

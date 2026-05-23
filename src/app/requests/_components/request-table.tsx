@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { Eye } from 'lucide-react';
 import { StatusBadge } from '../../../common/components/status-badge';
 import { EmptyState } from '../../../common/components/empty-state';
-import type { TUser } from '../../../api/users/type';
+import type { TRequest } from '../../../api/requests/type';
 import { Button } from '@/components/ui/button';
 import {
     Table,
@@ -13,39 +13,41 @@ import {
     TableRow,
 } from "@/components/ui/table";
 
-interface UserTableProps {
-    users: TUser[];
+interface RequestTableProps {
+    requests: TRequest[];
 }
 
-export const UserTable = ({ users }: UserTableProps) => {
+export const RequestTable = ({ requests }: RequestTableProps) => {
     return (
         <Table>
             <TableHeader>
                 <TableRow>
                     <TableHead>ID</TableHead>
-                    <TableHead>Nama</TableHead>
-                    <TableHead>Role</TableHead>
+                    <TableHead>Judul</TableHead>
+                    <TableHead>Deskripsi</TableHead>
+                    <TableHead>Tanggal Dibuat</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead className="w-[120px]">Aksi</TableHead>
                 </TableRow>
             </TableHeader>
             <TableBody>
-                {users.length > 0 ? (
-                    users.map((user) => (
-                        <TableRow key={user.id}>
-                            <TableCell>{user.id}</TableCell>
+                {requests.length > 0 ? (
+                    requests.map((req) => (
+                        <TableRow key={req.id}>
+                            <TableCell className="font-semibold">{req.id}</TableCell>
                             <TableCell className="font-medium">
-                                <Link to={`/users/${user.id}`} className="hover:underline hover:text-primary transition-colors">
-                                    {user.name}
+                                <Link to={`/requests/${req.id}`} className="hover:underline hover:text-primary transition-colors">
+                                    {req.title}
                                 </Link>
                             </TableCell>
-                            <TableCell>{user.role}</TableCell>
+                            <TableCell className="max-w-xs truncate">{req.description}</TableCell>
+                            <TableCell>{req.createdAt}</TableCell>
                             <TableCell>
-                                <StatusBadge status={user.status} />
+                                <StatusBadge status={req.status} />
                             </TableCell>
                             <TableCell>
                                 <Button variant="outline" size="sm" asChild>
-                                    <Link to={`/users/${user.id}`}>
+                                    <Link to={`/requests/${req.id}`}>
                                         <Eye className="h-3.5 w-3.5" />
                                         Detail
                                     </Link>
@@ -55,10 +57,10 @@ export const UserTable = ({ users }: UserTableProps) => {
                     ))
                 ) : (
                     <TableRow>
-                        <TableCell colSpan={5} className="p-0">
+                        <TableCell colSpan={6} className="p-0">
                             <EmptyState
-                                title="Data User Tidak Ditemukan"
-                                description="Tidak ada data user yang sesuai dengan kata kunci pencarian Anda."
+                                title="Data Request Tidak Ditemukan"
+                                description="Tidak ada data request yang sesuai dengan kata kunci pencarian Anda."
                             />
                         </TableCell>
                     </TableRow>
