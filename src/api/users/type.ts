@@ -7,4 +7,5 @@ export type TUser = {
   email: string;
   role: TUserRole;
   status: TUserStatus;
+  password: string;
 }

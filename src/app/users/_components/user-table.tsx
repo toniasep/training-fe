@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Eye } from 'lucide-react';
+import { Eye, Pencil } from 'lucide-react';
 import { StatusBadge } from '../../../common/components/status-badge';
 import { EmptyState } from '../../../common/components/empty-state';
 import type { TUser } from '../../../api/users/type';
@@ -15,18 +15,20 @@ import {
 
 interface UserTableProps {
     users: TUser[];
+    onEdit: (user: TUser) => void;
 }
 
-export const UserTable = ({ users }: UserTableProps) => {
+export const UserTable = ({ users, onEdit }: UserTableProps) => {
     return (
         <Table>
             <TableHeader>
                 <TableRow>
                     <TableHead>ID</TableHead>
                     <TableHead>Nama</TableHead>
+                    <TableHead>Email</TableHead>
                     <TableHead>Role</TableHead>
                     <TableHead>Status</TableHead>
-                    <TableHead className="w-[120px]">Aksi</TableHead>
+                    <TableHead className="w-[180px]">Aksi</TableHead>
                 </TableRow>
             </TableHeader>
             <TableBody>
@@ -39,17 +41,24 @@ export const UserTable = ({ users }: UserTableProps) => {
                                     {user.name}
                                 </Link>
                             </TableCell>
+                            <TableCell>{user.email}</TableCell>
                             <TableCell>{user.role}</TableCell>
                             <TableCell>
                                 <StatusBadge status={user.status} />
                             </TableCell>
                             <TableCell>
-                                <Button variant="outline" size="sm" asChild>
-                                    <Link to={`/users/${user.id}`}>
-                                        <Eye className="h-3.5 w-3.5" />
-                                        Detail
-                                    </Link>
-                                </Button>
+                                <div className="flex items-center gap-2">
+                                    <Button variant="outline" size="sm" asChild>
+                                        <Link to={`/users/${user.id}`}>
+                                            <Eye className="h-3.5 w-3.5 mr-1" />
+                                            Detail
+                                        </Link>
+                                    </Button>
+                                    <Button variant="outline" size="sm" onClick={() => onEdit(user)}>
+                                        <Pencil className="h-3.5 w-3.5 mr-1" />
+                                        Edit
+                                    </Button>
+                                </div>
                             </TableCell>
                         </TableRow>
                     ))

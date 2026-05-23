@@ -8,12 +8,19 @@ import UserDetailPage from './app/users/[id]/page';
 import RequestsPage from './app/requests/page';
 import RequestDetailPage from './app/requests/[id]/page';
 import AuditLogsPage from './app/audit-logs/page';
-
 import NotFoundPage from './app/not-found';
 import ForbiddenPage from './app/forbidden';
+import { useAuth } from './common/auth-context';
+import { Spinner } from './components/ui/spinner';
 
-// Komponen Layout untuk route yang butuh Sidebar & Topbar
 function ProtectedLayout() {
+  const { user, isLoading } = useAuth();
+  if (isLoading) {
+    return <Spinner className="h-8 w-8 text-blue-600" />
+  }
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
   return (
     <AppShell>
       <Outlet />
