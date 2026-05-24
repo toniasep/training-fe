@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { PageHeader } from '../../common/components/page-header';
-import { getAuditLogs } from '../../api/audit-log/api';
-import type { TAuditLog } from '../../api/audit-log/type';
+import { PageHeader } from '@/components/common/page-header';
+import { getAuditLogs } from '@/api/audit-log/api';
+import type { TAuditLog } from '@/api/audit-log/type';
 import { Spinner } from '@/components/ui/spinner';
 import { AlertTriangle } from 'lucide-react';
 import {
@@ -12,7 +12,7 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
-import { EmptyState } from '../../common/components/empty-state';
+import { EmptyState } from '@/components/common/empty-state';
 
 const AuditLogsPage = () => {
     const [auditLogs, setAuditLogs] = useState<TAuditLog[]>([]);

@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
-import { PageHeader } from '../../common/components/page-header';
+import { PageHeader } from '@/components/common/page-header';
 import { UserListFilter } from './_components/user-list-filter';
 import { UserTable } from './_components/user-table';
 import { UserFormDialog } from './_components/user-form-dialog';
-import { getUser } from '../../api/users/api';
+import { getUsers } from '@/api/users/api';
 import { Button } from '@/components/ui/button';
 import { Plus, AlertTriangle } from 'lucide-react';
-import type { TUser } from '../../api/users/type';
+import type { TUser } from '@/api/users/type';
 import { Spinner } from '@/components/ui/spinner';
 
 const UsersPage = () => {
@@ -28,7 +28,7 @@ const UsersPage = () => {
             }
         });
 
-        getUser(searchQuery)
+        getUsers(searchQuery)
             .then((data) => {
                 if (isMounted) {
                     setUsers(data);

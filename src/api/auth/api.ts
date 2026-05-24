@@ -1,17 +1,10 @@
-import { apiClient } from '../../lib/api-client';
-import type { TUser } from '../users/type';
+import { apiClient } from '@/lib/api-client';
+import type { TAuthUser, TLoginRequest, TLoginResponse } from '@/api/auth/type';
 
-export interface LoginResponse {
-  token: string;
-  user: TUser;
-}
+export const login = (data: TLoginRequest): Promise<TLoginResponse> => {
+  return apiClient.post<TLoginResponse>('/auth/login', data);
+};
 
-export const authApi = {
-  login(email: string, password: string): Promise<LoginResponse> {
-    return apiClient.post<LoginResponse>('/auth/login', { email, password });
-  },
-
-  getCurrentUser(): Promise<TUser> {
-    return apiClient.get<TUser>('/auth/me');
-  },
+export const getCurrentUser = (): Promise<TAuthUser> => {
+  return apiClient.get<TAuthUser>('/auth/me');
 };

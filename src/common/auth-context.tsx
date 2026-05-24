@@ -1,17 +1,10 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { authApi } from '../api/auth/api';
-
-interface AuthUser {
-    id: string;
-    email: string;
-    name: string;
-    role: string;
-    status: string;
-}
+import { getCurrentUser } from '@/api/auth/api';
+import type { TAuthUser } from '@/api/auth/type';
 
 interface AuthContextType {
-    user: AuthUser | null;
-    login: (token: string, user: AuthUser) => void;
+    user: TAuthUser | null;
+    login: (token: string, user: TAuthUser) => void;
     logout: () => void;
     isLoading: boolean;
 }
@@ -19,7 +12,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-    const [user, setUser] = useState<AuthUser | null>(null);
+    const [user, setUser] = useState<TAuthUser | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
@@ -43,7 +36,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
             try {
                 // Verify token with backend
-                const currentUser = await authApi.getCurrentUser();
+                const currentUser = await getCurrentUser();
                 setUser(currentUser);
                 localStorage.setItem('auth_user', JSON.stringify(currentUser));
             } catch (error) {
@@ -60,7 +53,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         verifySession();
     }, []);
 
-    const login = (token: string, user: AuthUser) => {
+    const login = (token: string, user: TAuthUser) => {
         setUser(user);
         localStorage.setItem('auth_token', token);
         localStorage.setItem('auth_user', JSON.stringify(user));

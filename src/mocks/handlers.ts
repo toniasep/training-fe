@@ -1,7 +1,7 @@
 import { http, HttpResponse, delay } from 'msw';
-import type { TUser } from '../api/users/type';
-import type { TRequest } from '../api/requests/type';
-import type { TAuditLog } from '../api/audit-log/type';
+import type { TUser } from '@/api/users/type';
+import type { TRequest } from '@/api/requests/type';
+import type { TAuditLog } from '@/api/audit-log/type';
 
 // -------------------------------------------------------------
 // Seeded Database (In-Memory)

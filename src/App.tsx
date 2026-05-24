@@ -1,17 +1,17 @@
 import { Route, Routes, Outlet, Navigate } from 'react-router-dom';
-import { AppShell } from './common/components/app-shell';
+import { AppShell } from '@/components/layout/app-shell';
 
-import LoginPage from './app/login/page';
-import DashboardPage from './app/dashboard/page';
-import UsersPage from './app/users/page';
-import UserDetailPage from './app/users/[id]/page';
-import RequestsPage from './app/requests/page';
-import RequestDetailPage from './app/requests/[id]/page';
-import AuditLogsPage from './app/audit-logs/page';
-import NotFoundPage from './app/not-found';
-import ForbiddenPage from './app/forbidden';
-import { useAuth } from './common/auth-context';
-import { Spinner } from './components/ui/spinner';
+import LoginPage from '@/app/login/page';
+import DashboardPage from '@/app/dashboard/page';
+import UsersPage from '@/app/users/page';
+import UserDetailPage from '@/app/users/[id]/page';
+import RequestsPage from '@/app/requests/page';
+import RequestDetailPage from '@/app/requests/[id]/page';
+import AuditLogsPage from '@/app/audit-logs/page';
+import NotFoundPage from '@/app/not-found';
+import ForbiddenPage from '@/app/forbidden';
+import { useAuth } from '@/common/auth-context';
+import { Spinner } from '@/components/ui/spinner';
 
 function ProtectedLayout() {
   const { user, isLoading } = useAuth();

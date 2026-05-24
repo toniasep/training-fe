@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { getUserById } from '../../../api/users/api';
-import { StatusBadge } from '../../../common/components/status-badge';
+import { getUserById } from '@/api/users/api';
+import { StatusBadge } from '@/components/common/status-badge';
 import { ArrowLeft, User, Mail, Shield, Activity, Hash, AlertTriangle } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Spinner } from '@/components/ui/spinner';
-import type { TUser } from '../../../api/users/type';
+import type { TUser } from '@/api/users/type';
 
 const UserDetailPage = () => {
     const { id } = useParams();

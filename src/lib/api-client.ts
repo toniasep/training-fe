@@ -1,3 +1,5 @@
+import axios from 'axios';
+
 export class ApiError extends Error {
   status: number;
   data: unknown;
@@ -10,101 +12,70 @@ export class ApiError extends Error {
   }
 }
 
-interface RequestOptions extends RequestInit {
+export interface RequestOptions {
   params?: Record<string, string | number | boolean | undefined>;
+  headers?: Record<string, string>;
 }
 
-const BASE_URL = '/api';
-
-async function request<T>(path: string, options: RequestOptions = {}): Promise<T> {
-  const { params, headers, ...restOptions } = options;
-
-  // Build URL with query params
-  let url = `${BASE_URL}${path}`;
-  if (params) {
-    const searchParams = new URLSearchParams();
-    Object.entries(params).forEach(([key, value]) => {
-      if (value !== undefined && value !== null) {
-        searchParams.append(key, String(value));
-      }
-    });
-    const queryString = searchParams.toString();
-    if (queryString) {
-      url += `?${queryString}`;
-    }
-  }
-
-  // Build Headers
-  const defaultHeaders: Record<string, string> = {
+const instance = axios.create({
+  baseURL: '/api',
+  headers: {
     'Content-Type': 'application/json',
-  };
+  },
+});
 
-  const token = localStorage.getItem('auth_token');
-  if (token) {
-    defaultHeaders['Authorization'] = `Bearer ${token}`;
-  }
-
-  const mergedHeaders = {
-    ...defaultHeaders,
-    ...headers,
-  };
-
-  const response = await fetch(url, {
-    ...restOptions,
-    headers: mergedHeaders,
-  });
-
-  if (!response.ok) {
-    let errorData: unknown;
-    try {
-      errorData = await response.json();
-    } catch {
-      errorData = { message: response.statusText || 'Terjadi kesalahan sistem' };
+// Request interceptor to add authorization header dynamically
+instance.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('auth_token');
+    if (token && config.headers) {
+      config.headers['Authorization'] = `Bearer ${token}`;
     }
-
-    const errorObj = errorData as Record<string, unknown>;
-    const errorMessage = typeof errorObj?.message === 'string'
-      ? errorObj.message
-      : 'Terjadi kesalahan pada request';
-
-    throw new ApiError(
-      response.status,
-      errorMessage,
-      errorData
-    );
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
   }
+);
 
-  // Handle 204 No Content or empty response
-  if (response.status === 204) {
-    return {} as T;
-  }
+// Response interceptor to format error responses into ApiError
+instance.interceptors.response.use(
+  (response) => {
+    // If status is 204 or data is empty, return empty object
+    if (response.status === 204 || !response.data) {
+      return {};
+    }
+    return response.data;
+  },
+  (error: unknown) => {
+    if (axios.isAxiosError(error)) {
+      const status = error.response?.status || 500;
+      const data = error.response?.data;
+      
+      const errorObj = data as Record<string, unknown> | undefined;
+      const errorMessage = typeof errorObj?.message === 'string'
+        ? errorObj.message
+        : error.message || 'Terjadi kesalahan pada request';
 
-  try {
-    return await response.json();
-  } catch {
-    return {} as T;
+      return Promise.reject(new ApiError(status, errorMessage, data));
+    }
+    
+    const err = error instanceof Error ? error : new Error('Terjadi kesalahan sistem');
+    return Promise.reject(new ApiError(500, err.message, err));
   }
-}
+);
 
 export const apiClient = {
   get<T>(path: string, options?: RequestOptions): Promise<T> {
-    return request<T>(path, { ...options, method: 'GET' });
+    return instance.get<T>(path, options) as Promise<T>;
   },
   post<T>(path: string, body?: unknown, options?: RequestOptions): Promise<T> {
-    return request<T>(path, {
-      ...options,
-      method: 'POST',
-      body: body ? JSON.stringify(body) : undefined,
-    });
+    return instance.post<T>(path, body, options) as Promise<T>;
   },
   put<T>(path: string, body?: unknown, options?: RequestOptions): Promise<T> {
-    return request<T>(path, {
-      ...options,
-      method: 'PUT',
-      body: body ? JSON.stringify(body) : undefined,
-    });
+    return instance.put<T>(path, body, options) as Promise<T>;
   },
   delete<T>(path: string, options?: RequestOptions): Promise<T> {
-    return request<T>(path, { ...options, method: 'DELETE' });
+    return instance.delete<T>(path, options) as Promise<T>;
   },
 };

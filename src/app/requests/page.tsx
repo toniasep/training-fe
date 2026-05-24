@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
-import { PageHeader } from '../../common/components/page-header';
+import { PageHeader } from '@/components/common/page-header';
 import { RequestListFilter } from './_components/request-list-filter';
 import { RequestTable } from './_components/request-table';
-import { getRequests } from '../../api/requests/api';
+import { getRequests } from '@/api/requests/api';
 import { Spinner } from '@/components/ui/spinner';
 import { AlertTriangle } from 'lucide-react';
-import type { TRequest } from '../../api/requests/type';
+import type { TRequest } from '@/api/requests/type';
 
 const RequestsPage = () => {
     const [searchQuery, setSearchQuery] = useState('');

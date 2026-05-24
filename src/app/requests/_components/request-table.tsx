@@ -1,8 +1,8 @@
 import { Link } from 'react-router-dom';
 import { Eye } from 'lucide-react';
-import { StatusBadge } from '../../../common/components/status-badge';
-import { EmptyState } from '../../../common/components/empty-state';
-import type { TRequest } from '../../../api/requests/type';
+import { StatusBadge } from '@/components/common/status-badge';
+import { EmptyState } from '@/components/common/empty-state';
+import type { TRequest } from '@/api/requests/type';
 import { Button } from '@/components/ui/button';
 import {
     Table,

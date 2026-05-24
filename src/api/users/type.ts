@@ -9,3 +9,6 @@ export type TUser = {
   status: TUserStatus;
   password: string;
 }
+
+export type TCreateUserRequest = Omit<TUser, 'id'>;
+export type TUpdateUserRequest = Partial<TCreateUserRequest>;

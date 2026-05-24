@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { getRequestById } from '../../../api/requests/api';
-import { StatusBadge } from '../../../common/components/status-badge';
+import { getRequestById } from '@/api/requests/api';
+import { StatusBadge } from '@/components/common/status-badge';
 import { ArrowLeft, FileText, Calendar, Hash, CheckCircle, Clock, XCircle, AlertTriangle } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Spinner } from '@/components/ui/spinner';
-import type { TRequest } from '../../../api/requests/type';
+import type { TRequest } from '@/api/requests/type';
 
 const RequestDetailPage = () => {
     const { id } = useParams();

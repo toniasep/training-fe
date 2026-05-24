@@ -2,8 +2,8 @@ import * as z from 'zod';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect, useState } from 'react';
-import { createUser, updateUser } from '../../../api/users/api';
-import type { TUser } from '../../../api/users/type';
+import { createUser, updateUser } from '@/api/users/api';
+import type { TUser } from '@/api/users/type';
 import {
     Dialog,
     DialogContent,
@@ -96,8 +96,6 @@ export const UserFormDialog = ({ open, onOpenChange, user, onSuccess }: UserForm
         setIsSubmitting(true);
         setSubmitError(null);
 
-        // Simulasi delay API (500ms)
-        await new Promise((resolve) => setTimeout(resolve, 500));
 
         try {
             if (isEdit && user) {
