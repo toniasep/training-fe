@@ -1,52 +1,15 @@
-import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { getUserById } from '@/api/users/api';
+import { useUserDetail } from '../_hooks/use-users';
 import { StatusBadge } from '@/components/common/status-badge';
 import { ArrowLeft, User, Mail, Shield, Activity, Hash, AlertTriangle } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Spinner } from '@/components/ui/spinner';
-import type { TUser } from '@/api/users/type';
 
 const UserDetailPage = () => {
     const { id } = useParams();
-    const [user, setUser] = useState<TUser | null>(null);
-    const [isLoading, setIsLoading] = useState(!!id);
-    const [error, setError] = useState<string | null>(null);
-
-    useEffect(() => {
-        if (!id) return;
-
-        let isMounted = true;
-        
-        queueMicrotask(() => {
-            if (isMounted) {
-                setIsLoading(true);
-                setError(null);
-            }
-        });
-
-        getUserById(id)
-            .then((data) => {
-                if (isMounted) {
-                    setUser(data);
-                    setIsLoading(false);
-                }
-            })
-            .catch((err: unknown) => {
-                if (isMounted) {
-                    console.error('Failed to fetch user details:', err);
-                    const errorMessage = err instanceof Error ? err.message : 'User tidak ditemukan.';
-                    setError(errorMessage);
-                    setIsLoading(false);
-                }
-            });
-
-        return () => {
-            isMounted = false;
-        };
-    }, [id]);
+    const { data: user, isLoading, error } = useUserDetail(id);
 
     if (isLoading) {
         return (
@@ -73,7 +36,7 @@ const UserDetailPage = () => {
                     <CardContent className="flex flex-col items-center justify-center">
                         <AlertTriangle className="h-10 w-10 text-red-500 mb-2" />
                         <p className="text-destructive font-medium mb-2">Gagal Memuat Detail User</p>
-                        <p className="text-muted-foreground text-sm">{error || `Tidak ada user dengan ID "${id}" di database.`}</p>
+                        <p className="text-muted-foreground text-sm">{error?.message || `Tidak ada user dengan ID "${id}" di database.`}</p>
                     </CardContent>
                 </Card>
             </div>

@@ -1,48 +1,14 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { PageHeader } from '@/components/common/page-header';
 import { RequestListFilter } from './_components/request-list-filter';
 import { RequestTable } from './_components/request-table';
-import { getRequests } from '@/api/requests/api';
+import { useRequests } from './_hooks/use-requests';
 import { Spinner } from '@/components/ui/spinner';
 import { AlertTriangle } from 'lucide-react';
-import type { TRequest } from '@/api/requests/type';
 
 const RequestsPage = () => {
     const [searchQuery, setSearchQuery] = useState('');
-    const [requests, setRequests] = useState<TRequest[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-
-    useEffect(() => {
-        let isMounted = true;
-        
-        queueMicrotask(() => {
-            if (isMounted) {
-                setIsLoading(true);
-                setError(null);
-            }
-        });
-
-        getRequests(searchQuery)
-            .then((data) => {
-                if (isMounted) {
-                    setRequests(data);
-                    setIsLoading(false);
-                }
-            })
-            .catch((err: unknown) => {
-                if (isMounted) {
-                    console.error('Failed to fetch requests:', err);
-                    const errorMessage = err instanceof Error ? err.message : 'Gagal mengambil data request.';
-                    setError(errorMessage);
-                    setIsLoading(false);
-                }
-            });
-
-        return () => {
-            isMounted = false;
-        };
-    }, [searchQuery]);
+    const { data: requests = [], isLoading, error } = useRequests(searchQuery);
 
     return (
         <div>
@@ -68,7 +34,7 @@ const RequestsPage = () => {
                     <AlertTriangle className="h-6 w-6 shrink-0 mt-0.5" />
                     <div>
                         <h4 className="font-semibold text-slate-100">Gagal Memuat Data</h4>
-                        <p className="text-sm mt-1">{error}</p>
+                        <p className="text-sm mt-1">{error.message || 'Gagal mengambil data request.'}</p>
                     </div>
                 </div>
             ) : (

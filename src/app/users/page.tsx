@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { PageHeader } from '@/components/common/page-header';
 import { UserListFilter } from './_components/user-list-filter';
 import { UserTable } from './_components/user-table';
 import { UserFormDialog } from './_components/user-form-dialog';
-import { getUsers } from '@/api/users/api';
+import { useUsers } from './_hooks/use-users';
 import { Button } from '@/components/ui/button';
 import { Plus, AlertTriangle } from 'lucide-react';
 import type { TUser } from '@/api/users/type';
@@ -11,43 +11,10 @@ import { Spinner } from '@/components/ui/spinner';
 
 const UsersPage = () => {
     const [searchQuery, setSearchQuery] = useState('');
-    const [refreshKey, setRefreshKey] = useState(0);
     const [dialogOpen, setDialogOpen] = useState(false);
     const [selectedUser, setSelectedUser] = useState<TUser | undefined>(undefined);
-    const [users, setUsers] = useState<TUser[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
 
-    useEffect(() => {
-        let isMounted = true;
-        
-        queueMicrotask(() => {
-            if (isMounted) {
-                setIsLoading(true);
-                setError(null);
-            }
-        });
-
-        getUsers(searchQuery)
-            .then((data) => {
-                if (isMounted) {
-                    setUsers(data);
-                    setIsLoading(false);
-                }
-            })
-            .catch((err: unknown) => {
-                if (isMounted) {
-                    console.error('Failed to fetch users:', err);
-                    const errorMessage = err instanceof Error ? err.message : 'Gagal mengambil data user.';
-                    setError(errorMessage);
-                    setIsLoading(false);
-                }
-            });
-
-        return () => {
-            isMounted = false;
-        };
-    }, [searchQuery, refreshKey]);
+    const { data: users = [], isLoading, error } = useUsers(searchQuery);
 
     const handleAddClick = () => {
         setSelectedUser(undefined);
@@ -60,7 +27,7 @@ const UsersPage = () => {
     };
 
     const handleSuccess = () => {
-        setRefreshKey(prev => prev + 1);
+        // Cache invalidation is handled in mutation hooks on success.
     };
 
     return (
@@ -93,7 +60,7 @@ const UsersPage = () => {
                     <AlertTriangle className="h-6 w-6 shrink-0 mt-0.5" />
                     <div>
                         <h4 className="font-semibold text-slate-100">Gagal Memuat Data</h4>
-                        <p className="text-sm mt-1">{error}</p>
+                        <p className="text-sm mt-1">{error.message || 'Gagal mengambil data user.'}</p>
                     </div>
                 </div>
             ) : (

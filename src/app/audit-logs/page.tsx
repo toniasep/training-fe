@@ -1,7 +1,5 @@
-import { useState, useEffect } from 'react';
 import { PageHeader } from '@/components/common/page-header';
-import { getAuditLogs } from '@/api/audit-log/api';
-import type { TAuditLog } from '@/api/audit-log/type';
+import { useAuditLogs } from './_hooks/use-audit-logs';
 import { Spinner } from '@/components/ui/spinner';
 import { AlertTriangle } from 'lucide-react';
 import {
@@ -15,40 +13,7 @@ import {
 import { EmptyState } from '@/components/common/empty-state';
 
 const AuditLogsPage = () => {
-    const [auditLogs, setAuditLogs] = useState<TAuditLog[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-
-    useEffect(() => {
-        let isMounted = true;
-        
-        queueMicrotask(() => {
-            if (isMounted) {
-                setIsLoading(true);
-                setError(null);
-            }
-        });
-
-        getAuditLogs()
-            .then((data) => {
-                if (isMounted) {
-                    setAuditLogs(data);
-                    setIsLoading(false);
-                }
-            })
-            .catch((err: unknown) => {
-                if (isMounted) {
-                    console.error('Failed to fetch audit logs:', err);
-                    const errorMessage = err instanceof Error ? err.message : 'Gagal mengambil data audit log.';
-                    setError(errorMessage);
-                    setIsLoading(false);
-                }
-            });
-
-        return () => {
-            isMounted = false;
-        };
-    }, []);
+    const { data: auditLogs = [], isLoading, error } = useAuditLogs();
 
     const formatTimestamp = (isoString: string) => {
         try {
@@ -79,7 +44,7 @@ const AuditLogsPage = () => {
                     <AlertTriangle className="h-6 w-6 shrink-0 mt-0.5" />
                     <div>
                         <h4 className="font-semibold text-slate-100">Gagal Memuat Data</h4>
-                        <p className="text-sm mt-1">{error}</p>
+                        <p className="text-sm mt-1">{error.message || 'Gagal mengambil data audit log.'}</p>
                     </div>
                 </div>
             ) : (

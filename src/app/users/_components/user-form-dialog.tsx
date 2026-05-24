@@ -1,8 +1,8 @@
 import * as z from 'zod';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useEffect, useState } from 'react';
-import { createUser, updateUser } from '@/api/users/api';
+import { useEffect } from 'react';
+import { useCreateUser, useUpdateUser } from '../_hooks/use-users';
 import type { TUser } from '@/api/users/type';
 import {
     Dialog,
@@ -45,9 +45,13 @@ interface UserFormDialogProps {
 }
 
 export const UserFormDialog = ({ open, onOpenChange, user, onSuccess }: UserFormDialogProps) => {
-    const [submitError, setSubmitError] = useState<string | null>(null);
-    const [isSubmitting, setIsSubmitting] = useState(false);
     const isEdit = !!user;
+
+    const createUserMutation = useCreateUser();
+    const updateUserMutation = useUpdateUser();
+
+    const isSubmitting = createUserMutation.isPending || updateUserMutation.isPending;
+    const submitError = createUserMutation.error?.message || updateUserMutation.error?.message || null;
 
     const {
         register,
@@ -69,6 +73,8 @@ export const UserFormDialog = ({ open, onOpenChange, user, onSuccess }: UserForm
     // Reset form values saat modal dibuka/tutup atau data user berubah
     useEffect(() => {
         if (open) {
+            createUserMutation.reset();
+            updateUserMutation.reset();
             if (user) {
                 reset({
                     name: user.name,
@@ -86,33 +92,27 @@ export const UserFormDialog = ({ open, onOpenChange, user, onSuccess }: UserForm
                     password: '',
                 });
             }
-            queueMicrotask(() => {
-                setSubmitError(null);
-            });
         }
-    }, [open, user, reset]);
+    }, [open, user, reset, createUserMutation, updateUserMutation]);
 
-    const onSubmit = async (data: UserFormSchema) => {
-        setIsSubmitting(true);
-        setSubmitError(null);
-
-
-        try {
-            if (isEdit && user) {
-                const updated = await updateUser(user.id, data);
-                if (!updated) {
-                    throw new Error('Gagal memperbarui user. User tidak ditemukan.');
+    const onSubmit = (data: UserFormSchema) => {
+        if (isEdit && user) {
+            updateUserMutation.mutate(
+                { id: user.id, data },
+                {
+                    onSuccess: () => {
+                        onSuccess();
+                        onOpenChange(false);
+                    },
                 }
-            } else {
-                await createUser(data);
-            }
-            onSuccess();
-            onOpenChange(false);
-        } catch (error: unknown) {
-            const errorMessage = error instanceof Error ? error.message : 'Terjadi kesalahan sistem. Silakan coba lagi.';
-            setSubmitError(errorMessage);
-        } finally {
-            setIsSubmitting(false);
+            );
+        } else {
+            createUserMutation.mutate(data, {
+                onSuccess: () => {
+                    onSuccess();
+                    onOpenChange(false);
+                },
+            });
         }
     };
 

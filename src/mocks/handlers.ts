@@ -368,6 +368,46 @@ export const handlers = [
     return HttpResponse.json(reqObj);
   }),
 
+  http.put('/api/requests/:id', async ({ params, request }) => {
+    await delay(800);
+
+    const authHeader = request.headers.get('Authorization');
+    const currentUser = getUserByToken(authHeader);
+    if (!currentUser) {
+      return new HttpResponse(
+        JSON.stringify({ message: 'Unauthorized.' }),
+        { status: 401 }
+      );
+    }
+
+    const { id } = params;
+    const body = (await request.json()) as Partial<TRequest>;
+    const index = mockRequests.findIndex((r) => r.id === id);
+
+    if (index === -1) {
+      return new HttpResponse(
+        JSON.stringify({ message: 'Permohonan tidak ditemukan.' }),
+        { status: 404 }
+      );
+    }
+
+    const oldStatus = mockRequests[index].status;
+    mockRequests[index] = {
+      ...mockRequests[index],
+      ...body,
+    };
+
+    mockAuditLogs.unshift({
+      id: `LOG-${Date.now()}`,
+      action: 'UPDATE_REQUEST',
+      actor: currentUser.email,
+      timestamp: new Date().toISOString(),
+      details: `Mengupdate status permohonan ID: ${id} (${oldStatus} -> ${mockRequests[index].status})`,
+    });
+
+    return HttpResponse.json(mockRequests[index]);
+  }),
+
   // 4. AUDIT LOGS HANDLER
   http.get('/api/audit-logs', async ({ request }) => {
     await delay(500);

@@ -1,52 +1,15 @@
-import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { getRequestById } from '@/api/requests/api';
+import { useRequestDetail } from '../_hooks/use-requests';
 import { StatusBadge } from '@/components/common/status-badge';
 import { ArrowLeft, FileText, Calendar, Hash, CheckCircle, Clock, XCircle, AlertTriangle } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Spinner } from '@/components/ui/spinner';
-import type { TRequest } from '@/api/requests/type';
 
 const RequestDetailPage = () => {
     const { id } = useParams();
-    const [request, setRequest] = useState<TRequest | null>(null);
-    const [isLoading, setIsLoading] = useState(!!id);
-    const [error, setError] = useState<string | null>(null);
-
-    useEffect(() => {
-        if (!id) return;
-
-        let isMounted = true;
-        
-        queueMicrotask(() => {
-            if (isMounted) {
-                setIsLoading(true);
-                setError(null);
-            }
-        });
-
-        getRequestById(id)
-            .then((data) => {
-                if (isMounted) {
-                    setRequest(data);
-                    setIsLoading(false);
-                }
-            })
-            .catch((err: unknown) => {
-                if (isMounted) {
-                    console.error('Failed to fetch request details:', err);
-                    const errorMessage = err instanceof Error ? err.message : 'Request tidak ditemukan.';
-                    setError(errorMessage);
-                    setIsLoading(false);
-                }
-            });
-
-        return () => {
-            isMounted = false;
-        };
-    }, [id]);
+    const { data: request, isLoading, error } = useRequestDetail(id);
 
     if (isLoading) {
         return (
@@ -73,7 +36,7 @@ const RequestDetailPage = () => {
                     <CardContent className="flex flex-col items-center justify-center">
                         <AlertTriangle className="h-10 w-10 text-red-500 mb-2" />
                         <p className="text-destructive font-medium mb-2">Gagal Memuat Detail Request</p>
-                        <p className="text-muted-foreground text-sm">{error || `Tidak ada request dengan ID "${id}" di database.`}</p>
+                        <p className="text-muted-foreground text-sm">{error?.message || `Tidak ada request dengan ID "${id}" di database.`}</p>
                     </CardContent>
                 </Card>
             </div>
