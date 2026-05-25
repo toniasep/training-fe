@@ -174,6 +174,7 @@ const UsersPage = () => {
                     title="Gagal Memuat Data"
                     message={error.message || 'Gagal mengambil data user.'}
                     onRetry={refetch}
+                    status={error.status}
                 />
             ) : (
                 <UserTable

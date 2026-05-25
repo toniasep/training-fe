@@ -6,7 +6,7 @@ import tseslint from 'typescript-eslint'
 import { defineConfig, globalIgnores } from 'eslint/config'
 
 export default defineConfig([
-  globalIgnores(['dist']),
+  globalIgnores(['dist', 'public/mockServiceWorker.js']),
   {
     files: ['**/*.{ts,tsx}'],
     extends: [
@@ -23,6 +23,7 @@ export default defineConfig([
         'warn',
         { allowConstantExport: true },
       ],
+      'react-hooks/incompatible-library': 'off',
     },
   },
   {

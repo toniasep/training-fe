@@ -149,6 +149,7 @@ const RequestsPage = () => {
                     title="Gagal Memuat Data"
                     message={error.message || 'Gagal mengambil data request.'}
                     onRetry={refetch}
+                    status={error.status}
                 />
             ) : (
                 <RequestTable

@@ -3,6 +3,7 @@ import { useRequestDetailQuery } from '../_hooks/use-request-detail-query';
 import { useUpdateRequestStatusMutation } from '../_hooks/use-update-request-status-mutation';
 import { useToast } from '@/app/_components/toast-context';
 import { StatusBadge } from '@/app/_components/status-badge';
+import type { TRequest } from '@/api/requests/types';
 import {
     ArrowLeft,
     FileText,

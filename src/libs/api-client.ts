@@ -19,7 +19,7 @@ export interface RequestOptions {
 }
 
 const instance = axios.create({
-  baseURL: '/api',
+  baseURL: import.meta.env.VITE_API_BASE_URL || '/api',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -57,6 +57,15 @@ instance.interceptors.response.use(
       const errorMessage = typeof errorObj?.message === 'string'
         ? errorObj.message
         : error.message || 'Terjadi kesalahan pada request';
+
+      // Global auth failure handler: clear session and redirect to login page
+      if (status === 401) {
+        localStorage.removeItem('auth_token');
+        localStorage.removeItem('auth_user');
+        if (window.location.pathname !== '/login') {
+          window.location.href = '/login';
+        }
+      }
 
       return Promise.reject(new ApiError(status, errorMessage, data));
     }

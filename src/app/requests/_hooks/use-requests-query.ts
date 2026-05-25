@@ -3,9 +3,10 @@ import { getRequests } from '@/api/requests';
 import type { TRequest } from '@/api/requests/types';
 import type { ListQuery } from '@/types/query';
 import { requestQueryKeys } from './query-keys';
+import { ApiError } from '@/libs/api-client';
 
 export const useRequestsQuery = (query?: ListQuery) => {
-  return useQuery<TRequest[], Error>({
+  return useQuery<TRequest[], ApiError>({
     queryKey: requestQueryKeys.list(query),
     queryFn: () => getRequests(query),
   });
