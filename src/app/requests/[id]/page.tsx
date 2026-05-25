@@ -3,13 +3,30 @@ import { useRequestDetailQuery } from '../_hooks/use-request-detail-query';
 import { useUpdateRequestStatusMutation } from '../_hooks/use-update-request-status-mutation';
 import { useToast } from '@/app/_components/toast-context';
 import { StatusBadge } from '@/app/_components/status-badge';
-import { ArrowLeft, FileText, Calendar, Hash, CheckCircle, Clock, XCircle } from 'lucide-react';
+import {
+    ArrowLeft,
+    FileText,
+    Calendar,
+    Hash,
+    CheckCircle,
+    Clock,
+    XCircle,
+    User,
+    AlertTriangle,
+} from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Spinner } from '@/components/ui/spinner';
 import { ErrorState } from '@/app/_components/error-state';
 import { useState } from 'react';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 
 const RequestDetailPage = () => {
     const { id } = useParams();
@@ -17,13 +34,24 @@ const RequestDetailPage = () => {
     const { mutate: updateStatus } = useUpdateRequestStatusMutation();
     const { toast } = useToast();
     const [updating, setUpdating] = useState(false);
+    const [simulationMode, setSimulationMode] = useState<'success' | '403' | '500'>('success');
 
     const handleUpdateStatus = (newStatus: 'Approved' | 'Rejected') => {
         if (!request) return;
         setUpdating(true);
 
+        const simulateError = simulationMode !== 'success' ? Number(simulationMode) : undefined;
+
         updateStatus(
-            { id: request.id, data: { status: newStatus } },
+            {
+                id: request.id,
+                data: {
+                    status: newStatus,
+                    ...((simulateError === 403 || simulateError === 500) && {
+                        simulateError,
+                    }),
+                } as unknown as Partial<TRequest>,
+            },
             {
                 onSuccess: () => {
                     const statusLabel = newStatus === 'Approved' ? 'disetujui' : 'ditolak';
@@ -90,6 +118,8 @@ const RequestDetailPage = () => {
                 return 'from-yellow-50 to-amber-100 border-yellow-200 dark:from-yellow-950 dark:to-amber-900 dark:border-yellow-800';
         }
     };
+
+    const priority = request.priority || 'Medium';
 
     return (
         <div>
@@ -175,28 +205,78 @@ const RequestDetailPage = () => {
                                     <span className="text-sm font-medium text-foreground">{request.createdAt}</span>
                                 </div>
                             </div>
+
+                            <div className="flex items-start gap-3 border-t md:border-t-0 border-border pt-6 md:pt-0">
+                                <div className={`p-2 rounded-lg ${priority === 'High'
+                                        ? 'bg-red-50 text-red-600 dark:bg-red-950/40 dark:text-red-400'
+                                        : priority === 'Medium'
+                                            ? 'bg-yellow-50 text-yellow-600 dark:bg-yellow-950/40 dark:text-yellow-400'
+                                            : 'bg-blue-50 text-blue-600 dark:bg-blue-950/40 dark:text-blue-400'
+                                    }`}>
+                                    <AlertTriangle className="h-4 w-4" />
+                                </div>
+                                <div>
+                                    <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block">Prioritas</span>
+                                    <span className={`text-sm font-bold ${priority === 'High'
+                                            ? 'text-red-600'
+                                            : priority === 'Medium'
+                                                ? 'text-yellow-600'
+                                                : 'text-blue-600'
+                                        }`}>{priority}</span>
+                                </div>
+                            </div>
+
+                            <div className="flex items-start gap-3">
+                                <div className="p-2 rounded-lg bg-teal-50 text-teal-600 dark:bg-teal-950/40 dark:text-teal-400">
+                                    <User className="h-4 w-4" />
+                                </div>
+                                <div>
+                                    <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block">Assignee</span>
+                                    <span className="text-sm font-medium text-foreground">{request.assignee || 'Belum ditugaskan'}</span>
+                                </div>
+                            </div>
                         </div>
 
                         {/* Approval / Rejection Actions for Pending requests */}
                         {request.status === 'Pending' && (
-                            <div className="flex items-center gap-3 mt-6 border-t border-border pt-6 justify-end">
-                                <Button
-                                    variant="outline"
-                                    onClick={() => handleUpdateStatus('Rejected')}
-                                    disabled={updating}
-                                    className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950 border-red-200"
-                                >
-                                    {updating ? <Spinner className="h-3.5 w-3.5 mr-2" /> : <XCircle className="h-4 w-4 mr-2" />}
-                                    Tolak Permohonan
-                                </Button>
-                                <Button
-                                    onClick={() => handleUpdateStatus('Approved')}
-                                    disabled={updating}
-                                    className="bg-emerald-600 hover:bg-emerald-700 text-white"
-                                >
-                                    {updating ? <Spinner className="h-3.5 w-3.5 mr-2" /> : <CheckCircle className="h-4 w-4 mr-2" />}
-                                    Setujui Permohonan
-                                </Button>
+                            <div className="flex flex-col md:flex-row items-center gap-4 mt-6 border-t border-border pt-6 justify-between w-full">
+                                {/* Simulator Mode Dropdown */}
+                                <div className="flex items-center gap-2 self-start md:self-center">
+                                    <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Simulasi Respon API:</span>
+                                    <Select
+                                        value={simulationMode}
+                                        onValueChange={(val) => setSimulationMode(val as 'success' | '403' | '500')}
+                                    >
+                                        <SelectTrigger className="w-48 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-xs h-8">
+                                            <SelectValue />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="success">Normal (Sukses)</SelectItem>
+                                            <SelectItem value="403">Simulasi 403 Forbidden</SelectItem>
+                                            <SelectItem value="500">Simulasi 500 Server Error</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+
+                                <div className="flex items-center gap-3 self-end">
+                                    <Button
+                                        variant="outline"
+                                        onClick={() => handleUpdateStatus('Rejected')}
+                                        disabled={updating}
+                                        className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/40 border-red-200"
+                                    >
+                                        {updating ? <Spinner className="h-3.5 w-3.5 mr-2" /> : <XCircle className="h-4 w-4 mr-2" />}
+                                        Tolak Permohonan
+                                    </Button>
+                                    <Button
+                                        onClick={() => handleUpdateStatus('Approved')}
+                                        disabled={updating}
+                                        className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                                    >
+                                        {updating ? <Spinner className="h-3.5 w-3.5 mr-2" /> : <CheckCircle className="h-4 w-4 mr-2" />}
+                                        Setujui Permohonan
+                                    </Button>
+                                </div>
                             </div>
                         )}
                     </div>

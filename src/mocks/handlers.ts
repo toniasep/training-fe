@@ -24,6 +24,8 @@ const mockRequests: TRequest[] = [
     description: 'Pengajuan cuti tahunan selama 5 hari kerja mulai tanggal 1 Juni 2026.',
     status: 'Approved',
     createdAt: '2026-05-10',
+    priority: 'Medium',
+    assignee: 'John Doe',
   },
   {
     id: 'REQ-002',
@@ -31,6 +33,8 @@ const mockRequests: TRequest[] = [
     description: 'Laptop workstation Macbook Pro M3 16-inch untuk menunjang aktivitas software engineering.',
     status: 'Pending',
     createdAt: '2026-05-15',
+    priority: 'High',
+    assignee: 'Jane Smith',
   },
   {
     id: 'REQ-003',
@@ -38,6 +42,8 @@ const mockRequests: TRequest[] = [
     description: 'Biaya paket internet pascabayar bulan April 2026 sebesar Rp 250.000.',
     status: 'Approved',
     createdAt: '2026-05-02',
+    priority: 'Low',
+    assignee: 'Emily Davis',
   },
   {
     id: 'REQ-004',
@@ -45,6 +51,8 @@ const mockRequests: TRequest[] = [
     description: 'Request akses read & write ke repositori git organisasi DOT untuk modul training frontend.',
     status: 'Rejected',
     createdAt: '2026-05-18',
+    priority: 'High',
+    assignee: 'Chris Johnson',
   },
   {
     id: 'REQ-005',
@@ -52,6 +60,8 @@ const mockRequests: TRequest[] = [
     description: 'Izin tidak masuk kerja dikarenakan sakit demam tinggi. Surat keterangan dokter terlampir.',
     status: 'Pending',
     createdAt: '2026-05-22',
+    priority: 'Medium',
+    assignee: 'John Doe',
   },
 ];
 
@@ -381,7 +391,8 @@ export const handlers = [
     }
 
     const { id } = params;
-    const body = (await request.json()) as Partial<TRequest>;
+    const body = (await request.json()) as Partial<TRequest> & { simulateError?: number };
+    const { simulateError, ...dataToUpdate } = body;
     const index = mockRequests.findIndex((r) => r.id === id);
 
     if (index === -1) {
@@ -391,10 +402,26 @@ export const handlers = [
       );
     }
 
+    // Simulate 403 Forbidden
+    if (simulateError === 403 || currentUser.email === 'forbidden@example.com') {
+      return new HttpResponse(
+        JSON.stringify({ message: 'Akses Ditolak (403): Anda tidak memiliki wewenang untuk menyetujui permohonan ini.' }),
+        { status: 403 }
+      );
+    }
+
+    // Simulate 500 Server Error
+    if (simulateError === 500 || currentUser.email === 'error-500@example.com') {
+      return new HttpResponse(
+        JSON.stringify({ message: 'Kesalahan Server Internal (500): Gagal memproses pembaruan status permohonan.' }),
+        { status: 500 }
+      );
+    }
+
     const oldStatus = mockRequests[index].status;
     mockRequests[index] = {
       ...mockRequests[index],
-      ...body,
+      ...dataToUpdate,
     };
 
     mockAuditLogs.unshift({

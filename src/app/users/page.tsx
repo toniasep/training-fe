@@ -10,16 +10,25 @@ import { Plus } from 'lucide-react';
 import type { TUser } from '@/api/users/types';
 import { Spinner } from '@/components/ui/spinner';
 import { ErrorState } from '@/app/_components/error-state';
+import type { SortingState, PaginationState } from '@tanstack/react-table';
 
 const UsersPage = () => {
     const [searchParams, setSearchParams] = useSearchParams();
-    const querySearch = searchParams.get('search') || '';
 
-    // Local input state for fluid UI typing response
+    // 1. Parse URL parameters (Single Source of Truth)
+    const querySearch = searchParams.get('search') || '';
+    const queryRole = searchParams.get('role') || '';
+    const queryStatus = searchParams.get('status') || '';
+    const querySortBy = searchParams.get('sortBy') || '';
+    const querySortOrder = searchParams.get('sortOrder') || 'asc';
+    const queryPage = Number(searchParams.get('page')) || 1;
+    const queryLimit = Number(searchParams.get('limit')) || 10;
+
+    // Local input state for search input (to debounce updates)
     const [inputValue, setInputValue] = useState(querySearch);
     const [prevQuerySearch, setPrevQuerySearch] = useState(querySearch);
-    
-    // Sync input value if URL parameter changes externally
+
+    // Sync local input value if URL parameter changes externally
     if (querySearch !== prevQuerySearch) {
         setPrevQuerySearch(querySearch);
         setInputValue(querySearch);
@@ -32,6 +41,7 @@ const UsersPage = () => {
                 const nextParams = new URLSearchParams(prev);
                 if (inputValue) {
                     nextParams.set('search', inputValue);
+                    nextParams.set('page', '1'); // Reset to page 1 on new search
                 } else {
                     nextParams.delete('search');
                 }
@@ -45,6 +55,9 @@ const UsersPage = () => {
     const [dialogOpen, setDialogOpen] = useState(false);
     const [selectedUser, setSelectedUser] = useState<TUser | undefined>(undefined);
 
+    // Fetch users using react-query.
+    // Note: We only pass search to API because our MSW mock handler filters by search.
+    // Sorting, page size, status/role filtering are managed client-side via TanStack Table.
     const { data: users = [], isLoading, error, refetch } = useUsersQuery({
         page: 1,
         limit: 10,
@@ -65,6 +78,68 @@ const UsersPage = () => {
         // Cache invalidation is handled in mutation hooks on success.
     };
 
+    // Helper to update URL params
+    const updateParams = (newParams: Record<string, string | number | null | undefined>) => {
+        setSearchParams((prev) => {
+            const next = new URLSearchParams(prev);
+            Object.entries(newParams).forEach(([key, val]) => {
+                if (val === null || val === undefined || val === '') {
+                    next.delete(key);
+                } else {
+                    next.set(key, String(val));
+                }
+            });
+            return next;
+        });
+    };
+
+    // Map table states to URL parameters
+    const sorting: SortingState = querySortBy
+        ? [{ id: querySortBy, desc: querySortOrder === 'desc' }]
+        : [];
+
+    const pagination: PaginationState = {
+        pageIndex: queryPage - 1,
+        pageSize: queryLimit,
+    };
+
+    const handleSortingChange = (nextSorting: SortingState) => {
+        if (nextSorting.length > 0) {
+            updateParams({
+                sortBy: nextSorting[0].id,
+                sortOrder: nextSorting[0].desc ? 'desc' : 'asc',
+                page: 1, // Reset page index on sorting change
+            });
+        } else {
+            updateParams({
+                sortBy: null,
+                sortOrder: null,
+            });
+        }
+    };
+
+    const handlePaginationChange = (nextPagination: PaginationState) => {
+        updateParams({
+            page: nextPagination.pageIndex + 1,
+            limit: nextPagination.pageSize,
+        });
+    };
+
+    const handleRoleChange = (role: string) => {
+        updateParams({ role, page: 1 });
+    };
+
+    const handleStatusChange = (status: string) => {
+        updateParams({ status, page: 1 });
+    };
+
+    const handleResetFilters = () => {
+        setInputValue('');
+        setSearchParams(new URLSearchParams());
+    };
+
+    const isFiltered = !!querySearch || !!queryRole || !!queryStatus;
+
     return (
         <div>
             <PageHeader
@@ -72,14 +147,18 @@ const UsersPage = () => {
                 description="Kelola data pengguna"
             />
 
-            <div className="flex items-center justify-between mb-6">
-                <div className="max-w-xs flex-1">
-                    <UserListFilter
-                        searchQuery={inputValue}
-                        onSearchChange={setInputValue}
-                    />
-                </div>
-                <Button onClick={handleAddClick}>
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                <UserListFilter
+                    searchQuery={inputValue}
+                    onSearchChange={setInputValue}
+                    roleFilter={queryRole}
+                    onRoleChange={handleRoleChange}
+                    statusFilter={queryStatus}
+                    onStatusChange={handleStatusChange}
+                    onReset={handleResetFilters}
+                    isFiltered={isFiltered}
+                />
+                <Button onClick={handleAddClick} className="self-end md:self-center">
                     <Plus className="mr-2 h-4 w-4" />
                     Tambah User
                 </Button>
@@ -97,7 +176,19 @@ const UsersPage = () => {
                     onRetry={refetch}
                 />
             ) : (
-                <UserTable users={users} onEdit={handleEditClick} isFiltered={!!querySearch} />
+                <UserTable
+                    users={users}
+                    onEdit={handleEditClick}
+                    sorting={sorting}
+                    onSortingChange={handleSortingChange}
+                    pagination={pagination}
+                    onPaginationChange={handlePaginationChange}
+                    roleFilter={queryRole}
+                    statusFilter={queryStatus}
+                    searchFilter={querySearch}
+                    isFiltered={isFiltered}
+                    onResetFilters={handleResetFilters}
+                />
             )}
 
             <UserFormDialog

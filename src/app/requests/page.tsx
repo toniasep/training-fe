@@ -6,15 +6,24 @@ import { RequestTable } from './_components/request-table';
 import { useRequestsQuery } from './_hooks/use-requests-query';
 import { Spinner } from '@/components/ui/spinner';
 import { ErrorState } from '@/app/_components/error-state';
+import type { SortingState, PaginationState } from '@tanstack/react-table';
 
 const RequestsPage = () => {
     const [searchParams, setSearchParams] = useSearchParams();
+
+    // 1. Parse URL parameters (Single Source of Truth)
     const querySearch = searchParams.get('search') || '';
+    const queryStatus = searchParams.get('status') || '';
+    const queryPriority = searchParams.get('priority') || '';
+    const querySortBy = searchParams.get('sortBy') || '';
+    const querySortOrder = searchParams.get('sortOrder') || 'asc';
+    const queryPage = Number(searchParams.get('page')) || 1;
+    const queryLimit = Number(searchParams.get('limit')) || 10;
 
     // Local input state for fluid UI typing response
     const [inputValue, setInputValue] = useState(querySearch);
     const [prevQuerySearch, setPrevQuerySearch] = useState(querySearch);
-    
+
     // Sync input value if URL parameter changes externally
     if (querySearch !== prevQuerySearch) {
         setPrevQuerySearch(querySearch);
@@ -28,6 +37,7 @@ const RequestsPage = () => {
                 const nextParams = new URLSearchParams(prev);
                 if (inputValue) {
                     nextParams.set('search', inputValue);
+                    nextParams.set('page', '1'); // Reset to page 1 on new search
                 } else {
                     nextParams.delete('search');
                 }
@@ -38,11 +48,76 @@ const RequestsPage = () => {
         return () => clearTimeout(timer);
     }, [inputValue, setSearchParams]);
 
+    // Fetch requests from API
+    // Note: We only pass search to API because our MSW mock handler filters by search.
+    // Status, priority, sorting, and pagination are handled client-side via TanStack Table.
     const { data: requests = [], isLoading, error, refetch } = useRequestsQuery({
         page: 1,
         limit: 10,
         search: querySearch,
     });
+
+    // Helper to update URL params
+    const updateParams = (newParams: Record<string, string | number | null | undefined>) => {
+        setSearchParams((prev) => {
+            const next = new URLSearchParams(prev);
+            Object.entries(newParams).forEach(([key, val]) => {
+                if (val === null || val === undefined || val === '') {
+                    next.delete(key);
+                } else {
+                    next.set(key, String(val));
+                }
+            });
+            return next;
+        });
+    };
+
+    // Map table states to URL parameters
+    const sorting: SortingState = querySortBy
+        ? [{ id: querySortBy, desc: querySortOrder === 'desc' }]
+        : [];
+
+    const pagination: PaginationState = {
+        pageIndex: queryPage - 1,
+        pageSize: queryLimit,
+    };
+
+    const handleSortingChange = (nextSorting: SortingState) => {
+        if (nextSorting.length > 0) {
+            updateParams({
+                sortBy: nextSorting[0].id,
+                sortOrder: nextSorting[0].desc ? 'desc' : 'asc',
+                page: 1, // Reset page index on sorting change
+            });
+        } else {
+            updateParams({
+                sortBy: null,
+                sortOrder: null,
+            });
+        }
+    };
+
+    const handlePaginationChange = (nextPagination: PaginationState) => {
+        updateParams({
+            page: nextPagination.pageIndex + 1,
+            limit: nextPagination.pageSize,
+        });
+    };
+
+    const handleStatusChange = (status: string) => {
+        updateParams({ status, page: 1 });
+    };
+
+    const handlePriorityChange = (priority: string) => {
+        updateParams({ priority, page: 1 });
+    };
+
+    const handleResetFilters = () => {
+        setInputValue('');
+        setSearchParams(new URLSearchParams());
+    };
+
+    const isFiltered = !!querySearch || !!queryStatus || !!queryPriority;
 
     return (
         <div>
@@ -51,10 +126,16 @@ const RequestsPage = () => {
                 description="Kelola dan verifikasi permohonan data"
             />
 
-            <div className="mb-6 max-w-xs">
+            <div className="mb-6">
                 <RequestListFilter
                     searchQuery={inputValue}
                     onSearchChange={setInputValue}
+                    statusFilter={queryStatus}
+                    onStatusChange={handleStatusChange}
+                    priorityFilter={queryPriority}
+                    onPriorityChange={handlePriorityChange}
+                    onReset={handleResetFilters}
+                    isFiltered={isFiltered}
                 />
             </div>
 
@@ -70,7 +151,18 @@ const RequestsPage = () => {
                     onRetry={refetch}
                 />
             ) : (
-                <RequestTable requests={requests} isFiltered={!!querySearch} />
+                <RequestTable
+                    requests={requests}
+                    sorting={sorting}
+                    onSortingChange={handleSortingChange}
+                    pagination={pagination}
+                    onPaginationChange={handlePaginationChange}
+                    statusFilter={queryStatus}
+                    priorityFilter={queryPriority}
+                    searchFilter={querySearch}
+                    isFiltered={isFiltered}
+                    onResetFilters={handleResetFilters}
+                />
             )}
         </div>
     );

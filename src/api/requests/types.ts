@@ -1,4 +1,5 @@
 export type TRequestStatus = 'Pending' | 'Approved' | 'Rejected';
+export type TRequestPriority = 'Low' | 'Medium' | 'High';
 
 export type TRequest = {
   id: string;
@@ -6,4 +7,6 @@ export type TRequest = {
   description: string;
   status: TRequestStatus;
   createdAt: string;
+  priority?: TRequestPriority;
+  assignee?: string;
 }
