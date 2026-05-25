@@ -2,7 +2,9 @@ import * as z from 'zod';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect } from 'react';
-import { useCreateUser, useUpdateUser } from '../_hooks/use-users';
+import { useCreateUser } from '../_hooks/use-create-user';
+import { useUpdateUser } from '../_hooks/use-update-user';
+import { useToast } from '@/components/layout/toast-context';
 import type { TUser } from '@/api/users/type';
 import {
     Dialog,
@@ -46,6 +48,7 @@ interface UserFormDialogProps {
 
 export const UserFormDialog = ({ open, onOpenChange, user, onSuccess }: UserFormDialogProps) => {
     const isEdit = !!user;
+    const { toast } = useToast();
 
     const createUserMutation = useCreateUser();
     const updateUserMutation = useUpdateUser();
@@ -70,11 +73,13 @@ export const UserFormDialog = ({ open, onOpenChange, user, onSuccess }: UserForm
         },
     });
 
-    // Reset form values saat modal dibuka/tutup atau data user berubah
+    const { reset: resetCreate } = createUserMutation;
+    const { reset: resetUpdate } = updateUserMutation;
+
     useEffect(() => {
         if (open) {
-            createUserMutation.reset();
-            updateUserMutation.reset();
+            resetCreate();
+            resetUpdate();
             if (user) {
                 reset({
                     name: user.name,
@@ -93,7 +98,7 @@ export const UserFormDialog = ({ open, onOpenChange, user, onSuccess }: UserForm
                 });
             }
         }
-    }, [open, user, reset, createUserMutation, updateUserMutation]);
+    }, [open, user, reset, resetCreate, resetUpdate]);
 
     const onSubmit = (data: UserFormSchema) => {
         if (isEdit && user) {
@@ -101,6 +106,7 @@ export const UserFormDialog = ({ open, onOpenChange, user, onSuccess }: UserForm
                 { id: user.id, data },
                 {
                     onSuccess: () => {
+                        toast(`User ${data.name} berhasil diperbarui.`, 'success');
                         onSuccess();
                         onOpenChange(false);
                     },
@@ -109,6 +115,7 @@ export const UserFormDialog = ({ open, onOpenChange, user, onSuccess }: UserForm
         } else {
             createUserMutation.mutate(data, {
                 onSuccess: () => {
+                    toast(`User ${data.name} berhasil ditambahkan.`, 'success');
                     onSuccess();
                     onOpenChange(false);
                 },

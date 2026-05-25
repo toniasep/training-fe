@@ -1,7 +1,7 @@
 import { PageHeader } from '@/components/common/page-header';
-import { useAuditLogs } from './_hooks/use-audit-logs';
+import { useAuditLogList } from './_hooks/use-audit-log-list';
 import { Spinner } from '@/components/ui/spinner';
-import { AlertTriangle } from 'lucide-react';
+import { ErrorState } from '@/components/common/error-state';
 import {
     Table,
     TableBody,
@@ -13,7 +13,7 @@ import {
 import { EmptyState } from '@/components/common/empty-state';
 
 const AuditLogsPage = () => {
-    const { data: auditLogs = [], isLoading, error } = useAuditLogs();
+    const { data: auditLogs = [], isLoading, error, refetch } = useAuditLogList();
 
     const formatTimestamp = (isoString: string) => {
         try {
@@ -40,13 +40,11 @@ const AuditLogsPage = () => {
                     <p className="text-sm text-slate-400">Memuat audit logs...</p>
                 </div>
             ) : error ? (
-                <div className="flex items-start gap-3 p-5 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400">
-                    <AlertTriangle className="h-6 w-6 shrink-0 mt-0.5" />
-                    <div>
-                        <h4 className="font-semibold text-slate-100">Gagal Memuat Data</h4>
-                        <p className="text-sm mt-1">{error.message || 'Gagal mengambil data audit log.'}</p>
-                    </div>
-                </div>
+                <ErrorState
+                    title="Gagal Memuat Data"
+                    message={error.message || 'Gagal mengambil data audit log.'}
+                    onRetry={refetch}
+                />
             ) : (
                 <Table>
                     <TableHeader>

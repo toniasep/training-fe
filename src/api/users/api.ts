@@ -1,8 +1,9 @@
 import { apiClient } from '@/lib/api-client';
 import type { TUser, TCreateUserRequest, TUpdateUserRequest } from '@/api/users/type';
+import type { UserListQuery } from '@/app/users/_types/user-list-query';
 
-export const getUsers = (searchQuery: string): Promise<TUser[]> => {
-  return apiClient.get<TUser[]>('/users', { params: { search: searchQuery } });
+export const getUsers = (query?: UserListQuery): Promise<TUser[]> => {
+  return apiClient.get<TUser[]>('/users', { params: { search: query?.search } });
 };
 
 export const getUserById = (id: string): Promise<TUser> => {

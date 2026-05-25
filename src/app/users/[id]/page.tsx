@@ -1,15 +1,43 @@
 import { useParams, Link } from 'react-router-dom';
-import { useUserDetail } from '../_hooks/use-users';
+import { useUserDetail } from '../_hooks/use-user-detail';
+import { useUpdateUserStatus } from '../_hooks/use-update-user-status';
+import { useToast } from '@/components/layout/toast-context';
 import { StatusBadge } from '@/components/common/status-badge';
-import { ArrowLeft, User, Mail, Shield, Activity, Hash, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, User, Mail, Shield, Activity, Hash, UserCheck, UserX } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Spinner } from '@/components/ui/spinner';
+import { ErrorState } from '@/components/common/error-state';
+import { useState } from 'react';
 
 const UserDetailPage = () => {
     const { id } = useParams();
-    const { data: user, isLoading, error } = useUserDetail(id);
+    const { data: user, isLoading, error, refetch } = useUserDetail(id);
+    const { mutate: updateStatus } = useUpdateUserStatus();
+    const { toast } = useToast();
+    const [updating, setUpdating] = useState(false);
+
+    const handleToggleStatus = () => {
+        if (!user) return;
+        const nextStatus = user.status === 'Aktif' ? 'Inactive' : 'Aktif';
+        const actionLabel = nextStatus === 'Aktif' ? 'mengaktifkan' : 'menonaktifkan';
+        setUpdating(true);
+
+        updateStatus(
+            { id: user.id, status: nextStatus },
+            {
+                onSuccess: () => {
+                    toast(`Berhasil ${actionLabel} user ${user.name}.`, 'success');
+                    setUpdating(false);
+                },
+                onError: (err) => {
+                    toast(err.message || `Gagal ${actionLabel} user.`, 'error');
+                    setUpdating(false);
+                },
+            }
+        );
+    };
 
     if (isLoading) {
         return (
@@ -32,13 +60,11 @@ const UserDetailPage = () => {
                     </Button>
                 </div>
                 <h1 className="text-2xl font-bold mb-4">Detail User</h1>
-                <Card className="max-w-2xl p-8 text-center border-red-500/20 bg-red-500/5">
-                    <CardContent className="flex flex-col items-center justify-center">
-                        <AlertTriangle className="h-10 w-10 text-red-500 mb-2" />
-                        <p className="text-destructive font-medium mb-2">Gagal Memuat Detail User</p>
-                        <p className="text-muted-foreground text-sm">{error?.message || `Tidak ada user dengan ID "${id}" di database.`}</p>
-                    </CardContent>
-                </Card>
+                <ErrorState
+                    title="Gagal Memuat Detail User"
+                    message={error?.message || `Tidak ada user dengan ID "${id}" di database.`}
+                    onRetry={refetch}
+                />
             </div>
         );
     }
@@ -59,7 +85,32 @@ const UserDetailPage = () => {
                     <h1 className="text-2xl font-bold tracking-tight">Detail User</h1>
                     <p className="text-muted-foreground text-sm">Menampilkan informasi lengkap akun pengguna</p>
                 </div>
-                <StatusBadge status={user.status} />
+                <div className="flex items-center gap-3">
+                    <StatusBadge status={user.status} />
+                    {user.status === 'Aktif' ? (
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            disabled={updating}
+                            onClick={handleToggleStatus}
+                            className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
+                        >
+                            {updating ? <Spinner className="h-3.5 w-3.5 mr-1" /> : <UserX className="h-4 w-4 mr-1" />}
+                            Nonaktifkan User
+                        </Button>
+                    ) : (
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            disabled={updating}
+                            onClick={handleToggleStatus}
+                            className="text-green-600 hover:text-green-700 hover:bg-green-50 border-green-200"
+                        >
+                            {updating ? <Spinner className="h-3.5 w-3.5 mr-1" /> : <UserCheck className="h-4 w-4 mr-1" />}
+                            Aktifkan User
+                        </Button>
+                    )}
+                </div>
             </div>
 
             <Card className="max-w-2xl overflow-hidden p-0 gap-0">

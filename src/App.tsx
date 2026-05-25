@@ -10,7 +10,7 @@ import RequestDetailPage from '@/app/requests/[id]/page';
 import AuditLogsPage from '@/app/audit-logs/page';
 import NotFoundPage from '@/app/not-found';
 import ForbiddenPage from '@/app/forbidden';
-import { useAuth } from '@/common/auth-context';
+import { useAuth } from '@/components/layout/auth-context';
 import { Spinner } from '@/components/ui/spinner';
 
 function ProtectedLayout() {

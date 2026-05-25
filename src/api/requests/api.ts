@@ -1,8 +1,9 @@
 import { apiClient } from '@/lib/api-client';
 import type { TRequest } from '@/api/requests/type';
+import type { ListQuery } from '@/types/query';
 
-export const getRequests = (searchQuery: string): Promise<TRequest[]> => {
-  return apiClient.get<TRequest[]>('/requests', { params: { search: searchQuery } });
+export const getRequests = (query?: ListQuery): Promise<TRequest[]> => {
+  return apiClient.get<TRequest[]>('/requests', { params: { search: query?.search } });
 };
 
 export const getRequestById = (id: string): Promise<TRequest> => {

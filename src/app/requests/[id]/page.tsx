@@ -1,15 +1,42 @@
 import { useParams, Link } from 'react-router-dom';
-import { useRequestDetail } from '../_hooks/use-requests';
+import { useRequestDetail } from '../_hooks/use-request-detail';
+import { useUpdateRequestStatus } from '../_hooks/use-update-request-status';
+import { useToast } from '@/components/layout/toast-context';
 import { StatusBadge } from '@/components/common/status-badge';
-import { ArrowLeft, FileText, Calendar, Hash, CheckCircle, Clock, XCircle, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, FileText, Calendar, Hash, CheckCircle, Clock, XCircle } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Spinner } from '@/components/ui/spinner';
+import { ErrorState } from '@/components/common/error-state';
+import { useState } from 'react';
 
 const RequestDetailPage = () => {
     const { id } = useParams();
-    const { data: request, isLoading, error } = useRequestDetail(id);
+    const { data: request, isLoading, error, refetch } = useRequestDetail(id);
+    const { mutate: updateStatus } = useUpdateRequestStatus();
+    const { toast } = useToast();
+    const [updating, setUpdating] = useState(false);
+
+    const handleUpdateStatus = (newStatus: 'Approved' | 'Rejected') => {
+        if (!request) return;
+        setUpdating(true);
+
+        updateStatus(
+            { id: request.id, data: { status: newStatus } },
+            {
+                onSuccess: () => {
+                    const statusLabel = newStatus === 'Approved' ? 'disetujui' : 'ditolak';
+                    toast(`Permohonan "${request.title}" berhasil ${statusLabel}.`, 'success');
+                    setUpdating(false);
+                },
+                onError: (err) => {
+                    toast(err.message || 'Gagal mengubah status permohonan.', 'error');
+                    setUpdating(false);
+                },
+            }
+        );
+    };
 
     if (isLoading) {
         return (
@@ -32,13 +59,11 @@ const RequestDetailPage = () => {
                     </Button>
                 </div>
                 <h1 className="text-2xl font-bold mb-4">Detail Request</h1>
-                <Card className="max-w-2xl p-8 text-center border-red-500/20 bg-red-500/5">
-                    <CardContent className="flex flex-col items-center justify-center">
-                        <AlertTriangle className="h-10 w-10 text-red-500 mb-2" />
-                        <p className="text-destructive font-medium mb-2">Gagal Memuat Detail Request</p>
-                        <p className="text-muted-foreground text-sm">{error?.message || `Tidak ada request dengan ID "${id}" di database.`}</p>
-                    </CardContent>
-                </Card>
+                <ErrorState
+                    title="Gagal Memuat Detail Request"
+                    message={error?.message || `Tidak ada request dengan ID "${id}" di database.`}
+                    onRetry={refetch}
+                />
             </div>
         );
     }
@@ -151,6 +176,29 @@ const RequestDetailPage = () => {
                                 </div>
                             </div>
                         </div>
+
+                        {/* Approval / Rejection Actions for Pending requests */}
+                        {request.status === 'Pending' && (
+                            <div className="flex items-center gap-3 mt-6 border-t border-border pt-6 justify-end">
+                                <Button
+                                    variant="outline"
+                                    onClick={() => handleUpdateStatus('Rejected')}
+                                    disabled={updating}
+                                    className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950 border-red-200"
+                                >
+                                    {updating ? <Spinner className="h-3.5 w-3.5 mr-2" /> : <XCircle className="h-4 w-4 mr-2" />}
+                                    Tolak Permohonan
+                                </Button>
+                                <Button
+                                    onClick={() => handleUpdateStatus('Approved')}
+                                    disabled={updating}
+                                    className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                                >
+                                    {updating ? <Spinner className="h-3.5 w-3.5 mr-2" /> : <CheckCircle className="h-4 w-4 mr-2" />}
+                                    Setujui Permohonan
+                                </Button>
+                            </div>
+                        )}
                     </div>
                 </CardContent>
             </Card>

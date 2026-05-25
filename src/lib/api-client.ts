@@ -1,4 +1,5 @@
 import axios from 'axios';
+import type { AxiosInstance, AxiosRequestConfig } from 'axios';
 
 export class ApiError extends Error {
   status: number;
@@ -65,17 +66,14 @@ instance.interceptors.response.use(
   }
 );
 
-export const apiClient = {
-  get<T>(path: string, options?: RequestOptions): Promise<T> {
-    return instance.get<T>(path, options) as Promise<T>;
-  },
-  post<T>(path: string, body?: unknown, options?: RequestOptions): Promise<T> {
-    return instance.post<T>(path, body, options) as Promise<T>;
-  },
-  put<T>(path: string, body?: unknown, options?: RequestOptions): Promise<T> {
-    return instance.put<T>(path, body, options) as Promise<T>;
-  },
-  delete<T>(path: string, options?: RequestOptions): Promise<T> {
-    return instance.delete<T>(path, options) as Promise<T>;
-  },
-};
+export interface CustomAxiosInstance extends Omit<AxiosInstance, 'get' | 'post' | 'put' | 'delete' | 'patch' | 'request'> {
+  get<T = unknown, R = T, D = unknown>(url: string, config?: AxiosRequestConfig<D>): Promise<R>;
+  post<T = unknown, R = T, D = unknown>(url: string, data?: unknown, config?: AxiosRequestConfig<D>): Promise<R>;
+  put<T = unknown, R = T, D = unknown>(url: string, data?: unknown, config?: AxiosRequestConfig<D>): Promise<R>;
+  delete<T = unknown, R = T, D = unknown>(url: string, config?: AxiosRequestConfig<D>): Promise<R>;
+  patch<T = unknown, R = T, D = unknown>(url: string, data?: unknown, config?: AxiosRequestConfig<D>): Promise<R>;
+  request<T = unknown, R = T, D = unknown>(config: AxiosRequestConfig<D>): Promise<R>;
+}
+
+export const apiClient = instance as unknown as CustomAxiosInstance;
+

@@ -15,9 +15,10 @@ import {
 
 interface RequestTableProps {
     requests: TRequest[];
+    isFiltered: boolean;
 }
 
-export const RequestTable = ({ requests }: RequestTableProps) => {
+export const RequestTable = ({ requests, isFiltered }: RequestTableProps) => {
     return (
         <Table>
             <TableHeader>
@@ -59,8 +60,12 @@ export const RequestTable = ({ requests }: RequestTableProps) => {
                     <TableRow>
                         <TableCell colSpan={6} className="p-0">
                             <EmptyState
-                                title="Data Request Tidak Ditemukan"
-                                description="Tidak ada data request yang sesuai dengan kata kunci pencarian Anda."
+                                title={isFiltered ? "Pencarian Tidak Ditemukan" : "Data Request Kosong"}
+                                description={
+                                    isFiltered
+                                        ? "Tidak ada data request yang sesuai dengan kata kunci pencarian Anda."
+                                        : "Belum ada data request di sistem ini."
+                                }
                             />
                         </TableCell>
                     </TableRow>
