@@ -1,9 +1,9 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { updateUser } from '@/api/users/api';
-import type { TUser, TUpdateUserRequest } from '@/api/users/type';
+import { updateUser } from '@/api/users';
+import type { TUser, TUpdateUserRequest } from '@/api/users/types';
 import { userQueryKeys } from './query-keys';
 
-export const useUpdateUser = () => {
+export const useUpdateUserMutation = () => {
   const queryClient = useQueryClient();
 
   return useMutation<TUser, Error, { id: string; data: TUpdateUserRequest }>({

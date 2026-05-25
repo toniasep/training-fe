@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
-import { getCurrentUser } from '@/api/auth/api';
-import type { TAuthUser } from '@/api/auth/type';
+import { getCurrentUser } from '@/api/auth';
+import type { TAuthUser } from '@/api/auth/types';
 
 export const useCurrentUserQuery = () => {
   const token = localStorage.getItem('auth_token');

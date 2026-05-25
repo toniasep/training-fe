@@ -1,7 +1,7 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { useAuth } from '@/components/layout/auth-context';
+import { useAuth } from '@/app/_components/auth-context';
 import { useNavigate, Navigate } from 'react-router-dom';
 import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { useState } from 'react';
 import { AlertCircle, LockKeyhole } from 'lucide-react';
 import { Spinner } from '@/components/ui/spinner';
-import { login as loginApi } from '@/api/auth/api';
+import { login as loginApi } from '@/api/auth';
 
 const loginSchema = z.object({
     email: z.string().min(1, 'Email wajib diisi').email('Format email tidak valid'),

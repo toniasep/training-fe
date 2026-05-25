@@ -1,9 +1,9 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { updateRequest } from '@/api/requests/api';
-import type { TRequest } from '@/api/requests/type';
+import { updateRequest } from '@/api/requests';
+import type { TRequest } from '@/api/requests/types';
 import { requestQueryKeys } from './query-keys';
 
-export const useUpdateRequestStatus = () => {
+export const useUpdateRequestStatusMutation = () => {
   const queryClient = useQueryClient();
 
   return useMutation<TRequest, Error, { id: string; data: Partial<TRequest> }>({

@@ -1,5 +1,5 @@
-import { apiClient } from '@/lib/api-client';
-import type { TUser, TCreateUserRequest, TUpdateUserRequest } from '@/api/users/type';
+import { apiClient } from '@/libs/api-client';
+import type { TUser, TCreateUserRequest, TUpdateUserRequest } from '@/api/users/types';
 import type { UserListQuery } from '@/app/users/_types/user-list-query';
 
 export const getUsers = (query?: UserListQuery): Promise<TUser[]> => {

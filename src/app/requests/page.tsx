@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { PageHeader } from '@/components/common/page-header';
+import { PageHeader } from '@/app/_components/page-header';
 import { RequestListFilter } from './_components/request-list-filter';
 import { RequestTable } from './_components/request-table';
-import { useRequestList } from './_hooks/use-request-list';
+import { useRequestsQuery } from './_hooks/use-requests-query';
 import { Spinner } from '@/components/ui/spinner';
-import { ErrorState } from '@/components/common/error-state';
+import { ErrorState } from '@/app/_components/error-state';
 
 const RequestsPage = () => {
     const [searchParams, setSearchParams] = useSearchParams();
@@ -38,7 +38,7 @@ const RequestsPage = () => {
         return () => clearTimeout(timer);
     }, [inputValue, setSearchParams]);
 
-    const { data: requests = [], isLoading, error, refetch } = useRequestList({
+    const { data: requests = [], isLoading, error, refetch } = useRequestsQuery({
         page: 1,
         limit: 10,
         search: querySearch,

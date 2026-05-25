@@ -1,20 +1,20 @@
 import { useParams, Link } from 'react-router-dom';
-import { useRequestDetail } from '../_hooks/use-request-detail';
-import { useUpdateRequestStatus } from '../_hooks/use-update-request-status';
-import { useToast } from '@/components/layout/toast-context';
-import { StatusBadge } from '@/components/common/status-badge';
+import { useRequestDetailQuery } from '../_hooks/use-request-detail-query';
+import { useUpdateRequestStatusMutation } from '../_hooks/use-update-request-status-mutation';
+import { useToast } from '@/app/_components/toast-context';
+import { StatusBadge } from '@/app/_components/status-badge';
 import { ArrowLeft, FileText, Calendar, Hash, CheckCircle, Clock, XCircle } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Spinner } from '@/components/ui/spinner';
-import { ErrorState } from '@/components/common/error-state';
+import { ErrorState } from '@/app/_components/error-state';
 import { useState } from 'react';
 
 const RequestDetailPage = () => {
     const { id } = useParams();
-    const { data: request, isLoading, error, refetch } = useRequestDetail(id);
-    const { mutate: updateStatus } = useUpdateRequestStatus();
+    const { data: request, isLoading, error, refetch } = useRequestDetailQuery(id);
+    const { mutate: updateStatus } = useUpdateRequestStatusMutation();
     const { toast } = useToast();
     const [updating, setUpdating] = useState(false);
 

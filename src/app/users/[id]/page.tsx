@@ -1,20 +1,20 @@
 import { useParams, Link } from 'react-router-dom';
-import { useUserDetail } from '../_hooks/use-user-detail';
-import { useUpdateUserStatus } from '../_hooks/use-update-user-status';
-import { useToast } from '@/components/layout/toast-context';
-import { StatusBadge } from '@/components/common/status-badge';
+import { useUserDetailQuery } from '../_hooks/use-user-detail-query';
+import { useUpdateUserStatusMutation } from '../_hooks/use-update-user-status-mutation';
+import { useToast } from '@/app/_components/toast-context';
+import { StatusBadge } from '@/app/_components/status-badge';
 import { ArrowLeft, User, Mail, Shield, Activity, Hash, UserCheck, UserX } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Spinner } from '@/components/ui/spinner';
-import { ErrorState } from '@/components/common/error-state';
+import { ErrorState } from '@/app/_components/error-state';
 import { useState } from 'react';
 
 const UserDetailPage = () => {
     const { id } = useParams();
-    const { data: user, isLoading, error, refetch } = useUserDetail(id);
-    const { mutate: updateStatus } = useUpdateUserStatus();
+    const { data: user, isLoading, error, refetch } = useUserDetailQuery(id);
+    const { mutate: updateStatus } = useUpdateUserStatusMutation();
     const { toast } = useToast();
     const [updating, setUpdating] = useState(false);
 

@@ -2,10 +2,10 @@ import * as z from 'zod';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect } from 'react';
-import { useCreateUser } from '../_hooks/use-create-user';
-import { useUpdateUser } from '../_hooks/use-update-user';
-import { useToast } from '@/components/layout/toast-context';
-import type { TUser } from '@/api/users/type';
+import { useCreateUserMutation } from '../_hooks/use-create-user-mutation';
+import { useUpdateUserMutation } from '../_hooks/use-update-user-mutation';
+import { useToast } from '@/app/_components/toast-context';
+import type { TUser } from '@/api/users/types';
 import {
     Dialog,
     DialogContent,
@@ -50,8 +50,8 @@ export const UserFormDialog = ({ open, onOpenChange, user, onSuccess }: UserForm
     const isEdit = !!user;
     const { toast } = useToast();
 
-    const createUserMutation = useCreateUser();
-    const updateUserMutation = useUpdateUser();
+    const createUserMutation = useCreateUserMutation();
+    const updateUserMutation = useUpdateUserMutation();
 
     const isSubmitting = createUserMutation.isPending || updateUserMutation.isPending;
     const submitError = createUserMutation.error?.message || updateUserMutation.error?.message || null;

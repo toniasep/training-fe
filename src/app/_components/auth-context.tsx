@@ -1,7 +1,7 @@
 import React, { createContext, useContext } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { useCurrentUserQuery } from '@/app/login/_hooks/use-current-user';
-import type { TAuthUser } from '@/api/auth/type';
+import { useCurrentUserQuery } from '@/app/login/_hooks/use-current-user-query';
+import type { TAuthUser } from '@/api/auth/types';
 
 interface AuthContextType {
     user: TAuthUser | null;

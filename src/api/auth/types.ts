@@ -1,4 +1,4 @@
-import type { TUser } from '@/api/users/type';
+import type { TUser } from '@/api/users/types';
 
 export type TLoginRequest = {
   email: string;

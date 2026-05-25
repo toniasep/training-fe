@@ -1,11 +1,11 @@
 import { Link } from 'react-router-dom';
 import { Eye, Pencil, UserCheck, UserX } from 'lucide-react';
-import { StatusBadge } from '@/components/common/status-badge';
-import { EmptyState } from '@/components/common/empty-state';
-import type { TUser } from '@/api/users/type';
+import { StatusBadge } from '@/app/_components/status-badge';
+import { EmptyState } from '@/app/_components/empty-state';
+import type { TUser } from '@/api/users/types';
 import { Button } from '@/components/ui/button';
-import { useUpdateUserStatus } from '../_hooks/use-update-user-status';
-import { useToast } from '@/components/layout/toast-context';
+import { useUpdateUserStatusMutation } from '../_hooks/use-update-user-status-mutation';
+import { useToast } from '@/app/_components/toast-context';
 import { useState } from 'react';
 import { Spinner } from '@/components/ui/spinner';
 import {
@@ -24,7 +24,7 @@ interface UserTableProps {
 }
 
 export const UserTable = ({ users, onEdit, isFiltered }: UserTableProps) => {
-    const { mutate: updateStatus } = useUpdateUserStatus();
+    const { mutate: updateStatus } = useUpdateUserStatusMutation();
     const { toast } = useToast();
     const [loadingUserId, setLoadingUserId] = useState<string | null>(null);
 

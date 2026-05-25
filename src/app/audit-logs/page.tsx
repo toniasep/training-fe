@@ -1,7 +1,7 @@
-import { PageHeader } from '@/components/common/page-header';
-import { useAuditLogList } from './_hooks/use-audit-log-list';
+import { PageHeader } from '@/app/_components/page-header';
+import { useAuditLogsQuery } from './_hooks/use-audit-logs-query';
 import { Spinner } from '@/components/ui/spinner';
-import { ErrorState } from '@/components/common/error-state';
+import { ErrorState } from '@/app/_components/error-state';
 import {
     Table,
     TableBody,
@@ -10,10 +10,10 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
-import { EmptyState } from '@/components/common/empty-state';
+import { EmptyState } from '@/app/_components/empty-state';
 
 const AuditLogsPage = () => {
-    const { data: auditLogs = [], isLoading, error, refetch } = useAuditLogList();
+    const { data: auditLogs = [], isLoading, error, refetch } = useAuditLogsQuery();
 
     const formatTimestamp = (isoString: string) => {
         try {

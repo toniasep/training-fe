@@ -1,5 +1,5 @@
-import { apiClient } from '@/lib/api-client';
-import type { TRequest } from '@/api/requests/type';
+import { apiClient } from '@/libs/api-client';
+import type { TRequest } from '@/api/requests/types';
 import type { ListQuery } from '@/types/query';
 
 export const getRequests = (query?: ListQuery): Promise<TRequest[]> => {

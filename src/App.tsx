@@ -1,5 +1,5 @@
 import { Route, Routes, Outlet, Navigate } from 'react-router-dom';
-import { AppShell } from '@/components/layout/app-shell';
+import { AppShell } from '@/app/_components/app-shell';
 
 import LoginPage from '@/app/login/page';
 import DashboardPage from '@/app/dashboard/page';
@@ -8,9 +8,9 @@ import UserDetailPage from '@/app/users/[id]/page';
 import RequestsPage from '@/app/requests/page';
 import RequestDetailPage from '@/app/requests/[id]/page';
 import AuditLogsPage from '@/app/audit-logs/page';
-import NotFoundPage from '@/app/not-found';
-import ForbiddenPage from '@/app/forbidden';
-import { useAuth } from '@/components/layout/auth-context';
+import NotFoundPage from '@/app/not-found/page';
+import ForbiddenPage from '@/app/forbidden/page';
+import { useAuth } from '@/app/_components/auth-context';
 import { Spinner } from '@/components/ui/spinner';
 
 function ProtectedLayout() {

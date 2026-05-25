@@ -1,15 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { PageHeader } from '@/components/common/page-header';
+import { PageHeader } from '@/app/_components/page-header';
 import { UserListFilter } from './_components/user-list-filter';
 import { UserTable } from './_components/user-table';
 import { UserFormDialog } from './_components/user-form-dialog';
-import { useUserList } from './_hooks/use-user-list';
+import { useUsersQuery } from './_hooks/use-users-query';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
-import type { TUser } from '@/api/users/type';
+import type { TUser } from '@/api/users/types';
 import { Spinner } from '@/components/ui/spinner';
-import { ErrorState } from '@/components/common/error-state';
+import { ErrorState } from '@/app/_components/error-state';
 
 const UsersPage = () => {
     const [searchParams, setSearchParams] = useSearchParams();
@@ -45,7 +45,7 @@ const UsersPage = () => {
     const [dialogOpen, setDialogOpen] = useState(false);
     const [selectedUser, setSelectedUser] = useState<TUser | undefined>(undefined);
 
-    const { data: users = [], isLoading, error, refetch } = useUserList({
+    const { data: users = [], isLoading, error, refetch } = useUsersQuery({
         page: 1,
         limit: 10,
         search: querySearch,
