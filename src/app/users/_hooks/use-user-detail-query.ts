@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { getUserById } from '@/api/users';
 import type { TUser } from '@/api/users/types';
-import { userQueryKeys } from './query-keys';
+import { userQueryKeys } from '../_const/query-keys';
 
 export const useUserDetailQuery = (id?: string) => {
   return useQuery<TUser, Error>({

@@ -6,10 +6,9 @@ import { useNavigate, Navigate } from 'react-router-dom';
 import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { useState } from 'react';
 import { AlertCircle, LockKeyhole } from 'lucide-react';
 import { Spinner } from '@/components/ui/spinner';
-import { login as loginApi } from '@/api/auth';
+import { useLoginMutation } from './_hooks/use-login-mutation';
 
 const loginSchema = z.object({
     email: z.string().min(1, 'Email wajib diisi').email('Format email tidak valid'),
@@ -19,10 +18,12 @@ const loginSchema = z.object({
 type LoginSchema = z.infer<typeof loginSchema>;
 
 const LoginPage = () => {
-    const { user, login } = useAuth();
+    const { user } = useAuth();
     const navigate = useNavigate();
-    const [submitError, setSubmitError] = useState<string | null>(null);
-    const [isSubmitting, setIsSubmitting] = useState(false);
+    const loginMutation = useLoginMutation();
+
+    const isSubmitting = loginMutation.isPending;
+    const submitError = loginMutation.error?.message || null;
 
     const {
         register,
@@ -40,20 +41,12 @@ const LoginPage = () => {
         return <Navigate to="/dashboard" replace />;
     }
 
-    const onSubmit = async (data: LoginSchema) => {
-        setIsSubmitting(true);
-        setSubmitError(null);
-
-        try {
-            const response = await loginApi(data);
-            login(response.token, response.user);
-            navigate('/dashboard');
-        } catch (error: unknown) {
-            console.error('Login error:', error);
-            const errorMessage = error instanceof Error ? error.message : 'Terjadi kesalahan sistem, silakan coba lagi.';
-            setSubmitError(errorMessage);
-            setIsSubmitting(false);
-        }
+    const onSubmit = (data: LoginSchema) => {
+        loginMutation.mutate(data, {
+            onSuccess: () => {
+                navigate('/dashboard');
+            },
+        });
     };
 
     return (
