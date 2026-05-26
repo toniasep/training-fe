@@ -56,9 +56,10 @@ export const RequestListFilter = ({
                         </SelectTrigger>
                         <SelectContent>
                             <SelectItem value="all">Semua Status</SelectItem>
-                            <SelectItem value="Pending">Pending</SelectItem>
-                            <SelectItem value="Approved">Approved</SelectItem>
-                            <SelectItem value="Rejected">Rejected</SelectItem>
+                            <SelectItem value="open">Open</SelectItem>
+                            <SelectItem value="in_review">In Review</SelectItem>
+                            <SelectItem value="approved">Approved</SelectItem>
+                            <SelectItem value="rejected">Rejected</SelectItem>
                         </SelectContent>
                     </Select>
                 </div>
@@ -70,12 +71,13 @@ export const RequestListFilter = ({
                         </SelectTrigger>
                         <SelectContent>
                             <SelectItem value="all">Semua Prioritas</SelectItem>
-                            <SelectItem value="Low">Low</SelectItem>
-                            <SelectItem value="Medium">Medium</SelectItem>
-                            <SelectItem value="High">High</SelectItem>
+                            <SelectItem value="low">Low</SelectItem>
+                            <SelectItem value="medium">Medium</SelectItem>
+                            <SelectItem value="high">High</SelectItem>
                         </SelectContent>
                     </Select>
                 </div>
+
 
                 {isFiltered && (
                     <Button variant="ghost" onClick={onReset} className="text-slate-500 hover:text-slate-900 dark:hover:text-white px-2">

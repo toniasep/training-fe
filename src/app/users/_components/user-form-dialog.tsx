@@ -28,10 +28,10 @@ import { AlertCircle } from 'lucide-react';
 const userSchema = z.object({
     name: z.string().min(2, 'Nama minimal terdiri dari 2 karakter'),
     email: z.string().min(1, 'Email wajib diisi').email('Format email tidak valid'),
-    role: z.enum(['Developer', 'Admin', 'User'] as const, {
+    role: z.enum(['admin', 'operator', 'viewer'] as const, {
         message: 'Role wajib dipilih',
     }),
-    status: z.enum(['Aktif', 'Pending', 'Inactive'] as const, {
+    status: z.enum(['active', 'invited', 'suspended'] as const, {
         message: 'Status wajib dipilih',
     }),
     password: z.string().min(1, 'Password wajib diisi'),
@@ -188,9 +188,9 @@ export const UserFormDialog = ({ open, onOpenChange, user, onSuccess }: UserForm
                                         <SelectValue placeholder="Pilih Role" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="Admin">Admin</SelectItem>
-                                        <SelectItem value="Developer">Developer</SelectItem>
-                                        <SelectItem value="User">User</SelectItem>
+                                        <SelectItem value="admin">Admin</SelectItem>
+                                        <SelectItem value="operator">Operator</SelectItem>
+                                        <SelectItem value="viewer">Viewer</SelectItem>
                                     </SelectContent>
                                 </Select>
                             )}
@@ -214,9 +214,9 @@ export const UserFormDialog = ({ open, onOpenChange, user, onSuccess }: UserForm
                                         <SelectValue placeholder="Pilih Status" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="Aktif">Aktif</SelectItem>
-                                        <SelectItem value="Pending">Pending</SelectItem>
-                                        <SelectItem value="Inactive">Inactive</SelectItem>
+                                        <SelectItem value="active">Active</SelectItem>
+                                        <SelectItem value="invited">Invited</SelectItem>
+                                        <SelectItem value="suspended">Suspended</SelectItem>
                                     </SelectContent>
                                 </Select>
                             )}

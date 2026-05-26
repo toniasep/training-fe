@@ -56,9 +56,9 @@ export const UserListFilter = ({
                         </SelectTrigger>
                         <SelectContent>
                             <SelectItem value="all">Semua Role</SelectItem>
-                            <SelectItem value="Admin">Admin</SelectItem>
-                            <SelectItem value="Developer">Developer</SelectItem>
-                            <SelectItem value="User">User</SelectItem>
+                            <SelectItem value="admin">Admin</SelectItem>
+                            <SelectItem value="operator">Operator</SelectItem>
+                            <SelectItem value="viewer">Viewer</SelectItem>
                         </SelectContent>
                     </Select>
                 </div>
@@ -70,12 +70,13 @@ export const UserListFilter = ({
                         </SelectTrigger>
                         <SelectContent>
                             <SelectItem value="all">Semua Status</SelectItem>
-                            <SelectItem value="Aktif">Aktif</SelectItem>
-                            <SelectItem value="Pending">Pending</SelectItem>
-                            <SelectItem value="Inactive">Inactive</SelectItem>
+                            <SelectItem value="active">Active</SelectItem>
+                            <SelectItem value="invited">Invited</SelectItem>
+                            <SelectItem value="suspended">Suspended</SelectItem>
                         </SelectContent>
                     </Select>
                 </div>
+
 
                 {isFiltered && (
                     <Button variant="ghost" onClick={onReset} className="text-slate-500 hover:text-slate-900 dark:hover:text-white px-2">

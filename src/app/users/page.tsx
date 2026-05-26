@@ -56,13 +56,19 @@ const UsersPage = () => {
     const [selectedUser, setSelectedUser] = useState<TUser | undefined>(undefined);
 
     // Fetch users using react-query.
-    // Note: We only pass search to API because our MSW mock handler filters by search.
-    // Sorting, page size, status/role filtering are managed client-side via TanStack Table.
-    const { data: users = [], isLoading, error, refetch } = useUsersQuery({
-        page: 1,
-        limit: 10,
+    const { data, isLoading, error, refetch } = useUsersQuery({
+        page: queryPage,
+        limit: queryLimit,
         search: querySearch,
+        role: queryRole,
+        status: queryStatus,
+        sortBy: querySortBy,
+        sortOrder: querySortOrder,
     });
+
+    const users = data?.data || [];
+    const totalUsers = data?.total || 0;
+
 
     const handleAddClick = () => {
         setSelectedUser(undefined);
@@ -179,14 +185,12 @@ const UsersPage = () => {
             ) : (
                 <UserTable
                     users={users}
+                    totalCount={totalUsers}
                     onEdit={handleEditClick}
                     sorting={sorting}
                     onSortingChange={handleSortingChange}
                     pagination={pagination}
                     onPaginationChange={handlePaginationChange}
-                    roleFilter={queryRole}
-                    statusFilter={queryStatus}
-                    searchFilter={querySearch}
                     isFiltered={isFiltered}
                     onResetFilters={handleResetFilters}
                 />

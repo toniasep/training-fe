@@ -20,8 +20,8 @@ const UserDetailPage = () => {
 
     const handleToggleStatus = () => {
         if (!user) return;
-        const nextStatus = user.status === 'Aktif' ? 'Inactive' : 'Aktif';
-        const actionLabel = nextStatus === 'Aktif' ? 'mengaktifkan' : 'menonaktifkan';
+        const nextStatus = user.status === 'active' ? 'suspended' : 'active';
+        const actionLabel = nextStatus === 'active' ? 'mengaktifkan' : 'menonaktifkan';
         setUpdating(true);
 
         updateStatus(
@@ -87,7 +87,7 @@ const UserDetailPage = () => {
                 </div>
                 <div className="flex items-center gap-3">
                     <StatusBadge status={user.status} />
-                    {user.status === 'Aktif' ? (
+                    {user.status === 'active' ? (
                         <Button
                             variant="outline"
                             size="sm"
@@ -170,8 +170,8 @@ const UserDetailPage = () => {
                             <div>
                                 <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block">Status</span>
                                 <span className="text-sm font-medium text-foreground flex items-center gap-1.5 mt-0.5">
-                                    <span className={`h-2 w-2 rounded-full ${user.status === 'Aktif' ? 'bg-green-500' : user.status === 'Pending' ? 'bg-yellow-500' : 'bg-red-500'}`} />
-                                    {user.status}
+                                    <span className={`h-2 w-2 rounded-full ${user.status === 'active' ? 'bg-green-500' : user.status === 'invited' ? 'bg-yellow-500' : 'bg-red-500'}`} />
+                                    {user.status === 'active' ? 'Active' : user.status === 'invited' ? 'Invited' : 'Suspended'}
                                 </span>
                             </div>
                         </div>

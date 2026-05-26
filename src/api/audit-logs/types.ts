@@ -1,7 +1,12 @@
+export type TAuditLogTargetType = 'user' | 'request' | 'auth';
+
 export type TAuditLog = {
   id: string;
+  actorName: string;
   action: string;
-  actor: string;
-  timestamp: string;
-  details: string;
+  targetType: TAuditLogTargetType;
+  targetId: string;
+  createdAt: string;
+  details?: string;
 }
+

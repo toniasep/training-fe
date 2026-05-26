@@ -49,7 +49,16 @@ const AuditLogsPage = () => {
     }, [inputValue, setSearchParams]);
 
     // Fetch audit logs via TanStack Query
-    const { data: auditLogs = [], isLoading, error, refetch } = useAuditLogsQuery();
+    const { data, isLoading, error, refetch } = useAuditLogsQuery({
+        page: queryPage,
+        limit: queryLimit,
+        search: querySearch,
+        actor: queryActor,
+        action: queryAction,
+    });
+
+    const auditLogs = data?.data || [];
+    const totalAuditLogs = data?.total || 0;
 
     // Helper to update URL params
     const updateParams = (newParams: Record<string, string | number | null | undefined>) => {
@@ -113,14 +122,13 @@ const AuditLogsPage = () => {
 
     const isFiltered = !!querySearch || !!queryActor || !!queryAction;
 
-    // Dynamically calculate unique actions and actors for select filters from full dataset
     const uniqueActors = useMemo(() => {
-        return Array.from(new Set(auditLogs.map((log) => log.actor))).filter(Boolean).sort();
-    }, [auditLogs]);
+        return ['john.doe@example.com', 'jane.smith@example.com', 'emily.davis@example.com', 'chris.johnson@example.com', 'forbidden@example.com', 'error-500@example.com'];
+    }, []);
 
     const uniqueActions = useMemo(() => {
-        return Array.from(new Set(auditLogs.map((log) => log.action))).filter(Boolean).sort();
-    }, [auditLogs]);
+        return ['LOGIN', 'CREATE_USER', 'UPDATE_USER', 'UPDATE_REQUEST'];
+    }, []);
 
     return (
         <div>
@@ -157,13 +165,11 @@ const AuditLogsPage = () => {
             ) : (
                 <AuditLogTable
                     auditLogs={auditLogs}
+                    totalCount={totalAuditLogs}
                     sorting={sorting}
                     onSortingChange={handleSortingChange}
                     pagination={pagination}
                     onPaginationChange={handlePaginationChange}
-                    actorFilter={queryActor}
-                    actionFilter={queryAction}
-                    searchFilter={querySearch}
                     isFiltered={isFiltered}
                     onResetFilters={handleResetFilters}
                 />

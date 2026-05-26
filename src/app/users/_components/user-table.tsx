@@ -2,9 +2,6 @@ import { Link } from 'react-router-dom';
 import {
     useReactTable,
     getCoreRowModel,
-    getPaginationRowModel,
-    getSortedRowModel,
-    getFilteredRowModel,
     flexRender,
     type ColumnDef,
     type SortingState,
@@ -49,28 +46,24 @@ import {
 
 interface UserTableProps {
     users: TUser[];
+    totalCount: number;
     onEdit: (user: TUser) => void;
     sorting: SortingState;
     onSortingChange: (sorting: SortingState) => void;
     pagination: PaginationState;
     onPaginationChange: (pagination: PaginationState) => void;
-    roleFilter: string;
-    statusFilter: string;
-    searchFilter: string;
     isFiltered: boolean;
     onResetFilters: () => void;
 }
 
 export const UserTable = ({
     users,
+    totalCount,
     onEdit,
     sorting,
     onSortingChange,
     pagination,
     onPaginationChange,
-    roleFilter,
-    statusFilter,
-    searchFilter,
     isFiltered,
     onResetFilters,
 }: UserTableProps) => {
@@ -79,8 +72,8 @@ export const UserTable = ({
     const [loadingUserId, setLoadingUserId] = useState<string | null>(null);
 
     const handleToggleStatus = useCallback((user: TUser) => {
-        const nextStatus = user.status === 'Aktif' ? 'Inactive' : 'Aktif';
-        const actionLabel = nextStatus === 'Aktif' ? 'mengaktifkan' : 'menonaktifkan';
+        const nextStatus = user.status === 'active' ? 'suspended' : 'active';
+        const actionLabel = nextStatus === 'active' ? 'mengaktifkan' : 'menonaktifkan';
         setLoadingUserId(user.id);
 
         updateStatus(
@@ -195,13 +188,13 @@ export const UserTable = ({
                 const role = row.getValue('role') as string;
                 return (
                     <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
-                        role === 'Admin'
+                        role === 'admin'
                             ? 'bg-purple-100 text-purple-800 dark:bg-purple-950/40 dark:text-purple-300'
-                            : role === 'Developer'
+                            : role === 'operator'
                             ? 'bg-blue-100 text-blue-800 dark:bg-blue-950/40 dark:text-blue-300'
                             : 'bg-slate-100 text-slate-800 dark:bg-slate-800/40 dark:text-slate-300'
                     }`}>
-                        {role}
+                        {role === 'admin' ? 'Admin' : role === 'operator' ? 'Operator' : 'Viewer'}
                     </span>
                 );
             },
@@ -246,7 +239,7 @@ export const UserTable = ({
                             <Pencil className="h-3.5 w-3.5 mr-1 text-slate-500" />
                             Edit
                         </Button>
-                        {user.status === 'Aktif' ? (
+                        {user.status === 'active' ? (
                             <Button
                                 variant="outline"
                                 size="sm"
@@ -283,13 +276,7 @@ export const UserTable = ({
         },
     ], [loadingUserId, onEdit, handleToggleStatus]);
 
-    // Setup column filters
-    const columnFilters = useMemo(() => {
-        const filters = [];
-        if (roleFilter) filters.push({ id: 'role', value: roleFilter });
-        if (statusFilter) filters.push({ id: 'status', value: statusFilter });
-        return filters;
-    }, [roleFilter, statusFilter]);
+
 
     const table = useReactTable({
         data: users,
@@ -297,8 +284,6 @@ export const UserTable = ({
         state: {
             sorting,
             pagination,
-            columnFilters,
-            globalFilter: searchFilter,
         },
         onSortingChange: (updater) => {
             const nextSorting = typeof updater === 'function' ? updater(sorting) : updater;
@@ -309,14 +294,9 @@ export const UserTable = ({
             onPaginationChange(nextPagination);
         },
         getCoreRowModel: getCoreRowModel(),
-        getPaginationRowModel: getPaginationRowModel(),
-        getSortedRowModel: getSortedRowModel(),
-        getFilteredRowModel: getFilteredRowModel(),
-        globalFilterFn: (row, columnId, filterValue) => {
-            const val = row.getValue(columnId);
-            if (!val) return false;
-            return String(val).toLowerCase().includes(String(filterValue).toLowerCase());
-        },
+        manualPagination: true,
+        pageCount: Math.ceil(totalCount / pagination.pageSize),
+        manualSorting: true,
     });
 
     const hasRows = table.getRowModel().rows.length > 0;

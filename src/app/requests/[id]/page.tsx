@@ -37,7 +37,7 @@ const RequestDetailPage = () => {
     const [updating, setUpdating] = useState(false);
     const [simulationMode, setSimulationMode] = useState<'success' | '403' | '500'>('success');
 
-    const handleUpdateStatus = (newStatus: 'Approved' | 'Rejected') => {
+    const handleUpdateStatus = (newStatus: 'approved' | 'rejected') => {
         if (!request) return;
         setUpdating(true);
 
@@ -55,7 +55,7 @@ const RequestDetailPage = () => {
             },
             {
                 onSuccess: () => {
-                    const statusLabel = newStatus === 'Approved' ? 'disetujui' : 'ditolak';
+                    const statusLabel = newStatus === 'approved' ? 'disetujui' : 'ditolak';
                     toast(`Permohonan "${request.title}" berhasil ${statusLabel}.`, 'success');
                     setUpdating(false);
                 },
@@ -99,10 +99,10 @@ const RequestDetailPage = () => {
 
     // Helper to get status-specific styling
     const getStatusIcon = (status: string) => {
-        switch (status) {
-            case 'Approved':
+        switch (status.toLowerCase()) {
+            case 'approved':
                 return <CheckCircle className="h-5 w-5 text-green-600" />;
-            case 'Rejected':
+            case 'rejected':
                 return <XCircle className="h-5 w-5 text-red-600" />;
             default:
                 return <Clock className="h-5 w-5 text-yellow-600" />;
@@ -110,10 +110,10 @@ const RequestDetailPage = () => {
     };
 
     const getStatusBg = (status: string) => {
-        switch (status) {
-            case 'Approved':
+        switch (status.toLowerCase()) {
+            case 'approved':
                 return 'from-green-50 to-emerald-100 border-green-200 dark:from-green-950 dark:to-emerald-900 dark:border-green-800';
-            case 'Rejected':
+            case 'rejected':
                 return 'from-red-50 to-rose-100 border-red-200 dark:from-red-950 dark:to-rose-900 dark:border-red-800';
             default:
                 return 'from-yellow-50 to-amber-100 border-yellow-200 dark:from-yellow-950 dark:to-amber-900 dark:border-yellow-800';
@@ -143,10 +143,10 @@ const RequestDetailPage = () => {
 
             <Card className="max-w-2xl overflow-hidden p-0 gap-0">
                 {/* Header/Banner with status colors */}
-                <div className={`h-24 bg-gradient-to-r ${request.status === 'Approved' ? 'from-green-500 to-emerald-600' : request.status === 'Rejected' ? 'from-red-500 to-rose-600' : 'from-yellow-500 to-amber-600'} flex items-end px-6 pb-4`}>
+                <div className={`h-24 bg-gradient-to-r ${request.status === 'approved' ? 'from-green-500 to-emerald-600' : request.status === 'rejected' ? 'from-red-500 to-rose-600' : 'from-yellow-500 to-amber-600'} flex items-end px-6 pb-4`}>
                     <div className="flex items-center gap-4 translate-y-6">
                         <div className="h-16 w-16 rounded-full bg-background border-4 border-background flex items-center justify-center shadow-md">
-                            <FileText className={`h-8 w-8 ${request.status === 'Approved' ? 'text-green-600' : request.status === 'Rejected' ? 'text-red-600' : 'text-yellow-600'}`} />
+                            <FileText className={`h-8 w-8 ${request.status === 'approved' ? 'text-green-600' : request.status === 'rejected' ? 'text-red-600' : 'text-yellow-600'}`} />
                         </div>
                     </div>
                 </div>
@@ -166,11 +166,12 @@ const RequestDetailPage = () => {
                             {getStatusIcon(request.status)}
                         </div>
                         <div>
-                            <h4 className="text-sm font-bold text-foreground">Status Permohonan: {request.status}</h4>
+                            <h4 className="text-sm font-bold text-foreground">Status Permohonan: {request.status === 'approved' ? 'Approved' : request.status === 'rejected' ? 'Rejected' : request.status === 'in_review' ? 'In Review' : 'Open'}</h4>
                             <p className="text-xs text-muted-foreground mt-0.5">
-                                {request.status === 'Approved' && 'Permohonan ini telah disetujui dan diproses.'}
-                                {request.status === 'Rejected' && 'Permohonan ini telah ditolak oleh verifikator.'}
-                                {request.status === 'Pending' && 'Permohonan ini sedang dalam antrean peninjauan.'}
+                                {request.status === 'approved' && 'Permohonan ini telah disetujui dan diproses.'}
+                                {request.status === 'rejected' && 'Permohonan ini telah ditolak oleh verifikator.'}
+                                {request.status === 'in_review' && 'Permohonan ini sedang dalam proses peninjauan.'}
+                                {request.status === 'open' && 'Permohonan ini sedang dalam antrean peninjauan.'}
                             </p>
                         </div>
                     </div>
@@ -198,6 +199,16 @@ const RequestDetailPage = () => {
                             </div>
 
                             <div className="flex items-start gap-3">
+                                <div className="p-2 rounded-lg bg-violet-50 text-violet-600 dark:bg-violet-950 dark:text-violet-400">
+                                    <User className="h-4 w-4" />
+                                </div>
+                                <div>
+                                    <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block">Pengaju</span>
+                                    <span className="text-sm font-medium text-foreground">{request.requesterName}</span>
+                                </div>
+                            </div>
+
+                            <div className="flex items-start gap-3">
                                 <div className="p-2 rounded-lg bg-purple-50 text-purple-600 dark:bg-purple-950 dark:text-purple-400">
                                     <Calendar className="h-4 w-4" />
                                 </div>
@@ -208,9 +219,9 @@ const RequestDetailPage = () => {
                             </div>
 
                             <div className="flex items-start gap-3 border-t md:border-t-0 border-border pt-6 md:pt-0">
-                                <div className={`p-2 rounded-lg ${priority === 'High'
+                                <div className={`p-2 rounded-lg ${priority === 'high'
                                         ? 'bg-red-50 text-red-600 dark:bg-red-950/40 dark:text-red-400'
-                                        : priority === 'Medium'
+                                        : priority === 'medium'
                                             ? 'bg-yellow-50 text-yellow-600 dark:bg-yellow-950/40 dark:text-yellow-400'
                                             : 'bg-blue-50 text-blue-600 dark:bg-blue-950/40 dark:text-blue-400'
                                     }`}>
@@ -218,12 +229,12 @@ const RequestDetailPage = () => {
                                 </div>
                                 <div>
                                     <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block">Prioritas</span>
-                                    <span className={`text-sm font-bold ${priority === 'High'
+                                    <span className={`text-sm font-bold ${priority === 'high'
                                             ? 'text-red-600'
-                                            : priority === 'Medium'
+                                            : priority === 'medium'
                                                 ? 'text-yellow-600'
                                                 : 'text-blue-600'
-                                        }`}>{priority}</span>
+                                        }`}>{priority === 'high' ? 'High' : priority === 'medium' ? 'Medium' : 'Low'}</span>
                                 </div>
                             </div>
 
@@ -233,13 +244,13 @@ const RequestDetailPage = () => {
                                 </div>
                                 <div>
                                     <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block">Assignee</span>
-                                    <span className="text-sm font-medium text-foreground">{request.assignee || 'Belum ditugaskan'}</span>
+                                    <span className="text-sm font-medium text-foreground">{request.assigneeName || 'Belum ditugaskan'}</span>
                                 </div>
                             </div>
                         </div>
 
                         {/* Approval / Rejection Actions for Pending requests */}
-                        {request.status === 'Pending' && (
+                        {(request.status === 'open' || request.status === 'in_review') && (
                             <div className="flex flex-col md:flex-row items-center gap-4 mt-6 border-t border-border pt-6 justify-between w-full">
                                 {/* Simulator Mode Dropdown */}
                                 <div className="flex items-center gap-2 self-start md:self-center">
@@ -262,7 +273,7 @@ const RequestDetailPage = () => {
                                 <div className="flex items-center gap-3 self-end">
                                     <Button
                                         variant="outline"
-                                        onClick={() => handleUpdateStatus('Rejected')}
+                                        onClick={() => handleUpdateStatus('rejected')}
                                         disabled={updating}
                                         className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/40 border-red-200"
                                     >
@@ -270,7 +281,7 @@ const RequestDetailPage = () => {
                                         Tolak Permohonan
                                     </Button>
                                     <Button
-                                        onClick={() => handleUpdateStatus('Approved')}
+                                        onClick={() => handleUpdateStatus('approved')}
                                         disabled={updating}
                                         className="bg-emerald-600 hover:bg-emerald-700 text-white"
                                     >

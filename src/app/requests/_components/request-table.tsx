@@ -2,9 +2,6 @@ import { Link } from 'react-router-dom';
 import {
     useReactTable,
     getCoreRowModel,
-    getPaginationRowModel,
-    getSortedRowModel,
-    getFilteredRowModel,
     flexRender,
     type ColumnDef,
     type SortingState,
@@ -34,26 +31,22 @@ import {
 
 interface RequestTableProps {
     requests: TRequest[];
+    totalCount: number;
     sorting: SortingState;
     onSortingChange: (sorting: SortingState) => void;
     pagination: PaginationState;
     onPaginationChange: (pagination: PaginationState) => void;
-    statusFilter: string;
-    priorityFilter: string;
-    searchFilter: string;
     isFiltered: boolean;
     onResetFilters: () => void;
 }
 
 export const RequestTable = ({
     requests,
+    totalCount,
     sorting,
     onSortingChange,
     pagination,
     onPaginationChange,
-    statusFilter,
-    priorityFilter,
-    searchFilter,
     isFiltered,
     onResetFilters,
 }: RequestTableProps) => {
@@ -112,9 +105,9 @@ export const RequestTable = ({
             },
         },
         {
-            accessorKey: 'description',
-            header: () => <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Deskripsi</span>,
-            cell: ({ row }) => <p className="max-w-xs truncate text-slate-500 dark:text-slate-400">{row.getValue('description')}</p>,
+            accessorKey: 'requesterName',
+            header: () => <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Pengaju</span>,
+            cell: ({ row }) => <span className="text-slate-500 dark:text-slate-400">{row.getValue('requesterName')}</span>,
         },
         {
             accessorKey: 'createdAt',
@@ -179,23 +172,24 @@ export const RequestTable = ({
                 </Button>
             ),
             cell: ({ row }) => {
-                const priority = (row.getValue('priority') || 'Medium') as string;
+                const priority = (row.getValue('priority') || 'medium') as string;
+                const normPriority = priority.toLowerCase();
                 return (
                     <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
-                        priority === 'High'
+                        normPriority === 'high'
                             ? 'bg-red-100 text-red-800 dark:bg-red-950/40 dark:text-red-300'
-                            : priority === 'Medium'
+                            : normPriority === 'medium'
                             ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-950/40 dark:text-yellow-300'
                             : 'bg-blue-100 text-blue-800 dark:bg-blue-950/40 dark:text-blue-300'
                     }`}>
-                        {priority}
+                        {normPriority === 'high' ? 'High' : normPriority === 'medium' ? 'Medium' : 'Low'}
                     </span>
                 );
             },
             filterFn: 'equals',
         },
         {
-            accessorKey: 'assignee',
+            accessorKey: 'assigneeName',
             header: ({ column }) => (
                 <Button
                     variant="ghost"
@@ -213,7 +207,7 @@ export const RequestTable = ({
                     )}
                 </Button>
             ),
-            cell: ({ row }) => <span className="text-slate-600 dark:text-slate-300">{row.getValue('assignee') || 'Belum ditugaskan'}</span>,
+            cell: ({ row }) => <span className="text-slate-600 dark:text-slate-300">{row.getValue('assigneeName') || 'Belum ditugaskan'}</span>,
         },
         {
             id: 'actions',
@@ -234,13 +228,7 @@ export const RequestTable = ({
         },
     ], []);
 
-    // Setup column filters
-    const columnFilters = useMemo(() => {
-        const filters = [];
-        if (statusFilter) filters.push({ id: 'status', value: statusFilter });
-        if (priorityFilter) filters.push({ id: 'priority', value: priorityFilter });
-        return filters;
-    }, [statusFilter, priorityFilter]);
+
 
     const table = useReactTable({
         data: requests,
@@ -248,8 +236,6 @@ export const RequestTable = ({
         state: {
             sorting,
             pagination,
-            columnFilters,
-            globalFilter: searchFilter,
         },
         onSortingChange: (updater) => {
             const nextSorting = typeof updater === 'function' ? updater(sorting) : updater;
@@ -260,14 +246,9 @@ export const RequestTable = ({
             onPaginationChange(nextPagination);
         },
         getCoreRowModel: getCoreRowModel(),
-        getPaginationRowModel: getPaginationRowModel(),
-        getSortedRowModel: getSortedRowModel(),
-        getFilteredRowModel: getFilteredRowModel(),
-        globalFilterFn: (row, columnId, filterValue) => {
-            const val = row.getValue(columnId);
-            if (!val) return false;
-            return String(val).toLowerCase().includes(String(filterValue).toLowerCase());
-        },
+        manualPagination: true,
+        pageCount: Math.ceil(totalCount / pagination.pageSize),
+        manualSorting: true,
     });
 
     const hasRows = table.getRowModel().rows.length > 0;

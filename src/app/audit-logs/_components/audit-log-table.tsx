@@ -1,9 +1,6 @@
 import {
     useReactTable,
     getCoreRowModel,
-    getPaginationRowModel,
-    getSortedRowModel,
-    getFilteredRowModel,
     flexRender,
     type ColumnDef,
     type SortingState,
@@ -40,26 +37,22 @@ import {
 
 interface AuditLogTableProps {
     auditLogs: TAuditLog[];
+    totalCount: number;
     sorting: SortingState;
     onSortingChange: (sorting: SortingState) => void;
     pagination: PaginationState;
     onPaginationChange: (pagination: PaginationState) => void;
-    actorFilter: string;
-    actionFilter: string;
-    searchFilter: string;
     isFiltered: boolean;
     onResetFilters: () => void;
 }
 
 export const AuditLogTable = ({
     auditLogs,
+    totalCount,
     sorting,
     onSortingChange,
     pagination,
     onPaginationChange,
-    actorFilter,
-    actionFilter,
-    searchFilter,
     isFiltered,
     onResetFilters,
 }: AuditLogTableProps) => {
@@ -78,7 +71,7 @@ export const AuditLogTable = ({
 
     const columns = useMemo<ColumnDef<TAuditLog>[]>(() => [
         {
-            accessorKey: 'timestamp',
+            accessorKey: 'createdAt',
             header: ({ column }) => (
                 <Button
                     variant="ghost"
@@ -98,7 +91,7 @@ export const AuditLogTable = ({
             ),
             cell: ({ row }) => (
                 <span className="text-muted-foreground whitespace-nowrap text-xs font-mono">
-                    {formatTimestamp(row.getValue('timestamp'))}
+                    {formatTimestamp(row.getValue('createdAt'))}
                 </span>
             ),
         },
@@ -137,10 +130,9 @@ export const AuditLogTable = ({
                     </span>
                 );
             },
-            filterFn: 'equals',
         },
         {
-            accessorKey: 'actor',
+            accessorKey: 'actorName',
             header: ({ column }) => (
                 <Button
                     variant="ghost"
@@ -160,10 +152,27 @@ export const AuditLogTable = ({
             ),
             cell: ({ row }) => (
                 <span className="font-medium text-slate-300 text-sm">
-                    {row.getValue('actor')}
+                    {row.getValue('actorName')}
                 </span>
             ),
-            filterFn: 'equals',
+        },
+        {
+            accessorKey: 'targetType',
+            header: () => <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Target Type</span>,
+            cell: ({ row }) => (
+                <span className="capitalize text-slate-400 text-xs font-mono">
+                    {row.getValue('targetType')}
+                </span>
+            ),
+        },
+        {
+            accessorKey: 'targetId',
+            header: () => <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Target ID</span>,
+            cell: ({ row }) => (
+                <span className="text-slate-400 text-xs font-mono">
+                    {row.getValue('targetId')}
+                </span>
+            ),
         },
         {
             accessorKey: 'details',
@@ -176,13 +185,7 @@ export const AuditLogTable = ({
         },
     ], []);
 
-    // Setup column filters
-    const columnFilters = useMemo(() => {
-        const filters = [];
-        if (actorFilter) filters.push({ id: 'actor', value: actorFilter });
-        if (actionFilter) filters.push({ id: 'action', value: actionFilter });
-        return filters;
-    }, [actorFilter, actionFilter]);
+
 
     const table = useReactTable({
         data: auditLogs,
@@ -190,8 +193,6 @@ export const AuditLogTable = ({
         state: {
             sorting,
             pagination,
-            columnFilters,
-            globalFilter: searchFilter,
         },
         onSortingChange: (updater) => {
             const nextSorting = typeof updater === 'function' ? updater(sorting) : updater;
@@ -202,14 +203,9 @@ export const AuditLogTable = ({
             onPaginationChange(nextPagination);
         },
         getCoreRowModel: getCoreRowModel(),
-        getPaginationRowModel: getPaginationRowModel(),
-        getSortedRowModel: getSortedRowModel(),
-        getFilteredRowModel: getFilteredRowModel(),
-        globalFilterFn: (row, columnId, filterValue) => {
-            const val = row.getValue(columnId);
-            if (!val) return false;
-            return String(val).toLowerCase().includes(String(filterValue).toLowerCase());
-        },
+        manualPagination: true,
+        pageCount: Math.ceil(totalCount / pagination.pageSize),
+        manualSorting: true,
     });
 
     const hasRows = table.getRowModel().rows.length > 0;

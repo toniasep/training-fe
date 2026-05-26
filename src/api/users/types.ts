@@ -1,5 +1,5 @@
-export type TUserRole = 'Developer' | 'Admin' | 'User';
-export type TUserStatus = 'Aktif' | 'Pending' | 'Inactive';
+export type TUserRole = 'admin' | 'operator' | 'viewer';
+export type TUserStatus = 'active' | 'invited' | 'suspended';
 
 export type TUser = {
   id: string;
@@ -7,8 +7,10 @@ export type TUser = {
   email: string;
   role: TUserRole;
   status: TUserStatus;
-  password: string;
+  createdAt: string;
+  password?: string;
 }
 
-export type TCreateUserRequest = Omit<TUser, 'id'>;
-export type TUpdateUserRequest = Partial<TCreateUserRequest>;
+export type TCreateUserRequest = Omit<TUser, 'id' | 'createdAt'> & { password?: string };
+export type TUpdateUserRequest = Partial<Omit<TUser, 'id' | 'createdAt'>> & { password?: string };
+

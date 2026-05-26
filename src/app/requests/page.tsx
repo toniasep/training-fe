@@ -49,13 +49,19 @@ const RequestsPage = () => {
     }, [inputValue, setSearchParams]);
 
     // Fetch requests from API
-    // Note: We only pass search to API because our MSW mock handler filters by search.
-    // Status, priority, sorting, and pagination are handled client-side via TanStack Table.
-    const { data: requests = [], isLoading, error, refetch } = useRequestsQuery({
-        page: 1,
-        limit: 10,
+    const { data, isLoading, error, refetch } = useRequestsQuery({
+        page: queryPage,
+        limit: queryLimit,
         search: querySearch,
+        status: queryStatus,
+        priority: queryPriority,
+        sortBy: querySortBy,
+        sortOrder: querySortOrder,
     });
+
+    const requests = data?.data || [];
+    const totalRequests = data?.total || 0;
+
 
     // Helper to update URL params
     const updateParams = (newParams: Record<string, string | number | null | undefined>) => {
@@ -154,13 +160,11 @@ const RequestsPage = () => {
             ) : (
                 <RequestTable
                     requests={requests}
+                    totalCount={totalRequests}
                     sorting={sorting}
                     onSortingChange={handleSortingChange}
                     pagination={pagination}
                     onPaginationChange={handlePaginationChange}
-                    statusFilter={queryStatus}
-                    priorityFilter={queryPriority}
-                    searchFilter={querySearch}
                     isFiltered={isFiltered}
                     onResetFilters={handleResetFilters}
                 />
