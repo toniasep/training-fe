@@ -23,11 +23,11 @@ import {
 import { StatusBadge } from '@/app/_components/status-badge';
 import { EmptyState } from '@/app/_components/empty-state';
 import type { TUser } from '@/api/users/types';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/app/_components/ui/button';
 import { useUpdateUserStatusMutation } from '../_hooks/use-update-user-status-mutation';
 import { useToast } from '@/app/_components/toast-context';
 import { useState, useMemo, useCallback } from 'react';
-import { Spinner } from '@/components/ui/spinner';
+import { Spinner } from '@/app/_components/ui/spinner';
 import {
     Table,
     TableBody,
@@ -35,14 +35,14 @@ import {
     TableHead,
     TableHeader,
     TableRow,
-} from "@/components/ui/table";
+} from "@/app/_components/ui/table";
 import {
     Select,
     SelectContent,
     SelectItem,
     SelectTrigger,
     SelectValue,
-} from "@/components/ui/select";
+} from "@/app/_components/ui/select";
 
 interface UserTableProps {
     users: TUser[];

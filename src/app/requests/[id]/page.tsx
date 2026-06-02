@@ -15,10 +15,10 @@ import {
     User,
     AlertTriangle,
 } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
-import { Spinner } from '@/components/ui/spinner';
+import { Card, CardContent } from '@/app/_components/ui/card';
+import { Button } from '@/app/_components/ui/button';
+import { Separator } from '@/app/_components/ui/separator';
+import { Spinner } from '@/app/_components/ui/spinner';
 import { ErrorState } from '@/app/_components/error-state';
 import { useState } from 'react';
 import {
@@ -27,7 +27,7 @@ import {
     SelectItem,
     SelectTrigger,
     SelectValue,
-} from "@/components/ui/select";
+} from "@/app/_components/ui/select";
 
 const RequestDetailPage = () => {
     const { id } = useParams();

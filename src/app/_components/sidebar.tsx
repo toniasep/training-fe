@@ -9,7 +9,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from "@/components/ui/sidebar";
+} from "@/app/_components/ui/sidebar";
 import { LayoutDashboard, Users, FileText, ClipboardList } from "lucide-react";
 
 export const Sidebar = () => {

@@ -3,9 +3,9 @@ import { useUsersQuery } from '@/app/users/_hooks/use-users-query';
 import { useRequestsQuery } from '@/app/requests/_hooks/use-requests-query';
 import { useAuditLogsQuery } from '@/app/audit-logs/_hooks/use-audit-logs-query';
 import { Users, FileText, ClipboardList, ArrowRight, Clock, ShieldAlert } from 'lucide-react';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Card, CardHeader, CardTitle, CardContent } from '@/app/_components/ui/card';
 import { StatusBadge } from '@/app/_components/status-badge';
-import { Spinner } from '@/components/ui/spinner';
+import { Spinner } from '@/app/_components/ui/spinner';
 
 const DashboardPage = () => {
   // Fetch users, requests, and audit logs with minimum limits to get totals and recent entries

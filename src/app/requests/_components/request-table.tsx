@@ -11,7 +11,7 @@ import { Eye, ArrowUpDown, ArrowUp, ArrowDown, ChevronLeft, ChevronRight, Chevro
 import { StatusBadge } from '@/app/_components/status-badge';
 import { EmptyState } from '@/app/_components/empty-state';
 import type { TRequest } from '@/api/requests/types';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/app/_components/ui/button';
 import { useMemo } from 'react';
 import {
     Table,
@@ -20,14 +20,14 @@ import {
     TableHead,
     TableHeader,
     TableRow,
-} from "@/components/ui/table";
+} from "@/app/_components/ui/table";
 import {
     Select,
     SelectContent,
     SelectItem,
     SelectTrigger,
     SelectValue,
-} from "@/components/ui/select";
+} from "@/app/_components/ui/select";
 
 interface RequestTableProps {
     requests: TRequest[];

@@ -2,10 +2,10 @@ import { apiClient } from '@/libs/api-client';
 import type { TUser, TCreateUserRequest, TUpdateUserRequest } from '@/api/users/types';
 import type { UserListQuery } from '@/app/users/_types/user-list-query';
 
-export const getUsers = (
+export const getUsers = async (
   query?: UserListQuery & { sortBy?: string; sortOrder?: string }
 ): Promise<{ data: TUser[]; total: number }> => {
-  return apiClient.get<{ data: TUser[]; total: number }>('/users', {
+  const res = await apiClient.get<{ data: TUser[]; total: number }>('/users', {
     params: {
       search: query?.search,
       role: query?.role,
@@ -16,21 +16,26 @@ export const getUsers = (
       sortOrder: query?.sortOrder,
     },
   });
+  return res.data;
 };
 
-export const getUserById = (id: string): Promise<TUser> => {
-  return apiClient.get<TUser>(`/users/${id}`);
+export const getUserById = async (id: string): Promise<TUser> => {
+  const res = await apiClient.get<TUser>(`/users/${id}`);
+  return res.data;
 };
 
-export const createUser = (user: TCreateUserRequest): Promise<TUser> => {
-  return apiClient.post<TUser>('/users', user);
+export const createUser = async (user: TCreateUserRequest): Promise<TUser> => {
+  const res = await apiClient.post<TUser>('/users', user);
+  return res.data;
 };
 
-export const updateUser = (id: string, updatedFields: TUpdateUserRequest): Promise<TUser> => {
-  return apiClient.patch<TUser>(`/users/${id}`, updatedFields);
+export const updateUser = async (id: string, updatedFields: TUpdateUserRequest): Promise<TUser> => {
+  const res = await apiClient.patch<TUser>(`/users/${id}`, updatedFields);
+  return res.data;
 };
 
-export const updateUserStatus = (id: string, status: TUser['status']): Promise<TUser> => {
-  return apiClient.patch<TUser>(`/users/${id}/status`, { status });
+export const updateUserStatus = async (id: string, status: TUser['status']): Promise<TUser> => {
+  const res = await apiClient.patch<TUser>(`/users/${id}/status`, { status });
+  return res.data;
 };
 

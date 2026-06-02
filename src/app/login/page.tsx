@@ -3,11 +3,11 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useAuth } from '@/app/_components/auth-context';
 import { useNavigate, Navigate } from 'react-router-dom';
-import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
+import { Card, CardHeader, CardTitle, CardDescription } from '@/app/_components/ui/card';
+import { Input } from '@/app/_components/ui/input';
+import { Button } from '@/app/_components/ui/button';
 import { AlertCircle, LockKeyhole } from 'lucide-react';
-import { Spinner } from '@/components/ui/spinner';
+import { Spinner } from '@/app/_components/ui/spinner';
 import { useLoginMutation } from './_hooks/use-login-mutation';
 
 const loginSchema = z.object({

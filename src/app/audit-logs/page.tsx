@@ -4,7 +4,7 @@ import { PageHeader } from '@/app/_components/page-header';
 import { AuditLogFilter } from './_components/audit-log-filter';
 import { AuditLogTable } from './_components/audit-log-table';
 import { useAuditLogsQuery } from './_hooks/use-audit-logs-query';
-import { Spinner } from '@/components/ui/spinner';
+import { Spinner } from '@/app/_components/ui/spinner';
 import { ErrorState } from '@/app/_components/error-state';
 import type { SortingState, PaginationState } from '@tanstack/react-table';
 

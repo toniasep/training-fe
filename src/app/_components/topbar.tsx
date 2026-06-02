@@ -1,5 +1,5 @@
 import { useAuth } from '@/app/_components/auth-context';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/app/_components/ui/button';
 import { LogOut } from 'lucide-react';
 
 export const Topbar = () => {

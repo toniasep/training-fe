@@ -1,6 +1,6 @@
 import { ShieldAlert, ServerCrash, AlertTriangle, ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/app/_components/ui/button';
 
 interface ErrorStateProps {
   title: string;

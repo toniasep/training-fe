@@ -1,5 +1,5 @@
 import axios from 'axios';
-import type { AxiosInstance, AxiosRequestConfig } from 'axios';
+
 
 export class ApiError extends Error {
   status: number;
@@ -42,11 +42,7 @@ instance.interceptors.request.use(
 // Response interceptor to format error responses into ApiError
 instance.interceptors.response.use(
   (response) => {
-    // If status is 204 or data is empty, return empty object
-    if (response.status === 204 || !response.data) {
-      return {};
-    }
-    return response.data;
+    return response;
   },
   (error: unknown) => {
     if (axios.isAxiosError(error)) {
@@ -75,14 +71,5 @@ instance.interceptors.response.use(
   }
 );
 
-export interface CustomAxiosInstance extends Omit<AxiosInstance, 'get' | 'post' | 'put' | 'delete' | 'patch' | 'request'> {
-  get<T = unknown, R = T, D = unknown>(url: string, config?: AxiosRequestConfig<D>): Promise<R>;
-  post<T = unknown, R = T, D = unknown>(url: string, data?: unknown, config?: AxiosRequestConfig<D>): Promise<R>;
-  put<T = unknown, R = T, D = unknown>(url: string, data?: unknown, config?: AxiosRequestConfig<D>): Promise<R>;
-  delete<T = unknown, R = T, D = unknown>(url: string, config?: AxiosRequestConfig<D>): Promise<R>;
-  patch<T = unknown, R = T, D = unknown>(url: string, data?: unknown, config?: AxiosRequestConfig<D>): Promise<R>;
-  request<T = unknown, R = T, D = unknown>(config: AxiosRequestConfig<D>): Promise<R>;
-}
-
-export const apiClient = instance as unknown as CustomAxiosInstance;
+export const apiClient = instance;
 

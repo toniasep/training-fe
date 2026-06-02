@@ -4,7 +4,7 @@ import { PageHeader } from '@/app/_components/page-header';
 import { RequestListFilter } from './_components/request-list-filter';
 import { RequestTable } from './_components/request-table';
 import { useRequestsQuery } from './_hooks/use-requests-query';
-import { Spinner } from '@/components/ui/spinner';
+import { Spinner } from '@/app/_components/ui/spinner';
 import { ErrorState } from '@/app/_components/error-state';
 import type { SortingState, PaginationState } from '@tanstack/react-table';
 

@@ -5,10 +5,10 @@ import { UserListFilter } from './_components/user-list-filter';
 import { UserTable } from './_components/user-table';
 import { UserFormDialog } from './_components/user-form-dialog';
 import { useUsersQuery } from './_hooks/use-users-query';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/app/_components/ui/button';
 import { Plus } from 'lucide-react';
 import type { TUser } from '@/api/users/types';
-import { Spinner } from '@/components/ui/spinner';
+import { Spinner } from '@/app/_components/ui/spinner';
 import { ErrorState } from '@/app/_components/error-state';
 import type { SortingState, PaginationState } from '@tanstack/react-table';
 

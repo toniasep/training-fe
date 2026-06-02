@@ -12,17 +12,17 @@ import {
     DialogHeader,
     DialogTitle,
     DialogFooter,
-} from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Spinner } from '@/components/ui/spinner';
+} from '@/app/_components/ui/dialog';
+import { Input } from '@/app/_components/ui/input';
+import { Button } from '@/app/_components/ui/button';
+import { Spinner } from '@/app/_components/ui/spinner';
 import {
     Select,
     SelectContent,
     SelectItem,
     SelectTrigger,
     SelectValue,
-} from '@/components/ui/select';
+} from '@/app/_components/ui/select';
 import { AlertCircle } from 'lucide-react';
 
 const userSchema = z.object({

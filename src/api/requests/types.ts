@@ -12,3 +12,4 @@ export type TRequest = {
   assigneeName: string | null;
 }
 
+export type TUpdateRequest = Partial<Omit<TRequest, 'id' | 'createdAt'>>;

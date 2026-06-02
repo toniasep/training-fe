@@ -1,7 +1,7 @@
 import React from 'react';
 import { Sidebar } from '@/app/_components/sidebar';
 import { Topbar } from '@/app/_components/topbar';
-import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
+import { SidebarProvider, SidebarInset } from '@/app/_components/ui/sidebar';
 
 export const AppShell = ({ children }: { children: React.ReactNode }) => {
   return (

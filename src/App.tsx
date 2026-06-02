@@ -11,7 +11,7 @@ import AuditLogsPage from '@/app/audit-logs/page';
 import NotFoundPage from '@/app/not-found/page';
 import ForbiddenPage from '@/app/forbidden/page';
 import { useAuth } from '@/app/_components/auth-context';
-import { Spinner } from '@/components/ui/spinner';
+import { Spinner } from '@/app/_components/ui/spinner';
 
 function ProtectedLayout() {
   const { user, isLoading } = useAuth();

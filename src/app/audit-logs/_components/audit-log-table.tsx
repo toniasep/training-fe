@@ -17,7 +17,7 @@ import {
 } from 'lucide-react';
 import { EmptyState } from '@/app/_components/empty-state';
 import type { TAuditLog } from '@/api/audit-logs/types';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/app/_components/ui/button';
 import { useMemo } from 'react';
 import {
     Table,
@@ -26,14 +26,14 @@ import {
     TableHead,
     TableHeader,
     TableRow,
-} from "@/components/ui/table";
+} from "@/app/_components/ui/table";
 import {
     Select,
     SelectContent,
     SelectItem,
     SelectTrigger,
     SelectValue,
-} from "@/components/ui/select";
+} from "@/app/_components/ui/select";
 
 interface AuditLogTableProps {
     auditLogs: TAuditLog[];

@@ -1,13 +1,13 @@
 import { Search, X } from "lucide-react";
-import { Input } from "@/components/ui/input";
+import { Input } from "@/app/_components/ui/input";
 import {
     Select,
     SelectContent,
     SelectItem,
     SelectTrigger,
     SelectValue,
-} from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
+} from "@/app/_components/ui/select";
+import { Button } from "@/app/_components/ui/button";
 
 interface RequestListFilterProps {
     searchQuery: string;
